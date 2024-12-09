@@ -3,20 +3,23 @@
 
 #include "jeu.h"
 
+typedef struct 
+{
+    int socket; 
+    Joueur joueur;
+} Client;
+
 // Méthode pour initialiser le serveur
 int initialiser_serveur(const char *adresse_ip, int port);
 
 // Méthode pour accepter les connexions clieint
-int accespter_connexion(int serveur_socket);
+int accepter_connexion(int serveur_socket);
 
 // Méthode pour envoyer les cartes au joueurs
-void distribuer_cartes(int* cartes, int nb_cartes, int client_socket);
+void distribuer_cartes_clients(Etats_Jeu *jeu, Client *clients, int nb_joueurs);
 
 // Méthode pour la gestion les tours de jeu
-void gerer_tour(int *cartes, int nb_cartes, int client_socket);
-
-// Méthode de gestion de temps pour chaque tour
-void gerer_temps(int cleint_socket);
+void gerer_tours(Etats_Jeu *jeu, Client *clients, int nb_joueurs, int *indice_pile);
 
 //Boucle principale du serveur
 void boucle_principale(int serveur_socket);
