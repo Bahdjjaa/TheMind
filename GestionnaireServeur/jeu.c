@@ -44,10 +44,11 @@ void initialiser_jeu(Etats_Jeu *jeu, int nb_joueurs, int vies, int shurikens){
 }
 
 
-void distribuer_cartes(Etats_Jeu *jeu, Carte pile[], int *pile_indice){
+void distribuer_cartes(Etats_Jeu *jeu, Carte* pile, int *pile_indice){
     for(int i = 0; i < jeu->nb_joueurs; i++){
         jeu->joueurs[i].nb_cartes = jeu->niveau; // Chaque joueur reçoit 'niveau' cartes
         jeu->joueurs[i].main = malloc(jeu->niveau * sizeof(Carte)); // Allocation mémoire pour les cartes
+        jeu->cartes = pile;
 
         for(int j = 0; j < jeu->niveau; j++){
             jeu->joueurs[i].main[j] = pile[*pile_indice]; //Donner la carte suivate de la pile
@@ -70,10 +71,15 @@ void ordonner_cartes(Carte *pile, int nb_cartes){
 }
 
 void afficher_cartes(const Carte *cartes, int nb_cartes){
-    for(int i = 0; i < nb_cartes; i++){
-        printf("%d ", cartes[i].numero);
+    if(cartes != NULL){
+        for(int i = 0; i < nb_cartes; i++){
+            printf("%d ", cartes[i].numero);
+        }
+        printf("\n");
+    }else{
+        printf("Pile vide \n");
     }
-    printf("\n");
+   
 }
 
 void afficher_etat_jeu(const Etats_Jeu *jeu){
@@ -90,7 +96,7 @@ void afficher_etat_jeu(const Etats_Jeu *jeu){
 }
 
 
-void demarrer_manche(Etats_Jeu *jeu, Carte pile[], int *pile_indice){
+void demarrer_manche(Etats_Jeu *jeu, Carte* pile, int *pile_indice){
     jeu->niveau++; // Passer au niveau suivant
     distribuer_cartes(jeu, pile, pile_indice); // Distribuer les cartes
 
