@@ -3,6 +3,10 @@
 
 #include "jeu.h"
 
+#define MAX_CLIENTS 4
+#define NB_VIES 3
+#define NB_SHURIKENS 3
+
 typedef struct 
 {
     int socket; 

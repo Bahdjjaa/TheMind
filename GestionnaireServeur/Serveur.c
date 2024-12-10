@@ -7,9 +7,6 @@
 #include <sys/socket.h>
 #include <sys/select.h>
 
-#define MAX_CLIENTS 4
-#define NB_VIES 3
-#define NB_SHURIKENS 3
 #define TAILLE_BUFFER 1024
 
 // Initialiser le serveur
