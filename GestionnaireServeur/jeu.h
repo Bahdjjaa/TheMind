@@ -43,13 +43,13 @@ void initialiser_joueur(Joueur *joueur, int id);
 void initialiser_jeu(Etats_Jeu *etat, int nb_joueurs, int vies, int shurikens);
 
 // Méthode pour distribuer les cartes aux joueurs
-void distribuer_cartes(Etats_Jeu *etat,Carte pile[], int *pile_indice);
+void distribuer_cartes(Etats_Jeu *etat,Carte* pile, int *pile_indice);
 
 // Fonction utilitaire pour ordonner les cartes
 void ordonner_cartes(Carte *pile, int nb_cartes);
 
 // Méthode pour démarer une nouvelle manche
-void demarrer_manche(Etats_Jeu *etat, Carte pile[], int *pile_indice);
+void demarrer_manche(Etats_Jeu *etat, Carte* pile, int *pile_indice);
 
 // Méthode pour finir une manche (réussie ou échouée)
 int verifier_manche(const Etats_Jeu *jeu, int carte_jouee, int *indice_pile);
