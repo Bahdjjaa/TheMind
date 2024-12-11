@@ -65,10 +65,8 @@ int accepter_connexion(int serveur_socket)
     return client_socket;
 }
 
-<<<<<<< HEAD
+
 // Recevoir le nom d'un client
-=======
->>>>>>> 170e46b (Modification dans GestionnaireClient)
 char* recevoir_nom_client(int client_socket){
     char buffer[TAILLE_NOM_JOUEUR];
     ssize_t nom_recu = recv(client_socket, buffer, TAILLE_NOM_JOUEUR -1, 0);
