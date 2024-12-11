@@ -5,7 +5,7 @@
 int main(){
     printf(" === TEST DES MÉTHODE DE JEU ===");
 
-    printf("Méthode << generer_cartes >>\n");
+    printf("\nMéthode << generer_cartes >>\n");
     Carte pile1[NB_CARTES_TOTAL];
     generer_cartes(pile1);
     afficher_cartes(pile1, NB_CARTES_TOTAL);
@@ -15,6 +15,9 @@ int main(){
     melanger_cartes(pile2, 4);
     afficher_cartes(pile2, 4);
 
+    printf("\nMéthode << melanger_cartes PILE1>>\n");
+    melanger_cartes(pile1, NB_CARTES_TOTAL);
+    afficher_cartes(pile1, NB_CARTES_TOTAL);
 
     printf("\nMéthode << initialiser_joueur >>\n");
     Joueur joueur;
@@ -38,12 +41,9 @@ int main(){
     printf("\nMéthode << demarrer_manche >>\n");
     demarrer_manche(&jeu, pile2, &pile_indice);
 
-    printf("\nMéthode << ordonner_cartes >>\n");
-    printf("Cartes non ordonnées : ");
-    afficher_cartes(jeu.cartes, 4);
-    ordonner_cartes(jeu.cartes, 4);
     printf("Cartes ordonnées : ");
-    afficher_cartes(jeu.cartes, 4);
+    afficher_cartes(jeu.cartes, jeu.nb_cartes);
+
 
     printf("\nMéthode << verifier_manche >>\n");
     int indice_pile = 0;
@@ -60,12 +60,5 @@ int main(){
     }else{
         printf("La cartes est incorrecte {résultat attendu}\n");
     }
-
-
-
-
-
-
-
     return 0;
 }
