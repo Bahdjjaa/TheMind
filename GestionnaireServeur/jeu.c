@@ -24,9 +24,11 @@ void melanger_cartes(Carte* pile, int nb_cartes){
 }
 
 // Joueur par défaut 
-void initialiser_joueur(Joueur *joueur, int id){
+void initialiser_joueur(Joueur *joueur, int id, const char *nom){
     joueur->id = id;
     joueur->main = NULL;
+    strncpy(joueur->nom, nom, sizeof(joueur->nom) - 1);
+    joueur->nom[sizeof(joueur->nom) - 1] = '\0';
     joueur->nb_cartes = 0;
 }
 
@@ -38,7 +40,9 @@ void initialiser_jeu(Etats_Jeu *jeu, int nb_joueurs, int vies, int shurikens){
     jeu->nb_joueurs = nb_joueurs;
     jeu->joueurs = malloc(nb_joueurs * sizeof(Joueur));
     for(int i = 0; i < nb_joueurs; i++){
-        initialiser_joueur(&jeu->joueurs[i], i+1);
+        Joueur joueur = jeu->joueurs[i];
+        char *nom = jeu->joueurs[i].nom;
+        initialiser_joueur(&joueur, i+1, nom);
     }
 }
 

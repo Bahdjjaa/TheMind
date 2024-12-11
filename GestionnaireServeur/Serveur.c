@@ -65,6 +65,30 @@ int accepter_connexion(int serveur_socket)
     return client_socket;
 }
 
+char* recevoir_nom_client(int client_socket){
+    char buffer[TAILLE_NOM_JOUEUR];
+    ssize_t nom_recu = recv(client_socket, buffer, TAILLE_NOM_JOUEUR -1, 0);
+
+    if(nom_recu > 0){
+        buffer[nom_recu] = '\0'; //Assurer que le nom est nul terminé
+        printf("Nom du client connecté : %s\n", buffer);
+
+        // Allocation mémpire pour le nom
+        char *nom = malloc((nom_recu + 1) * sizeof(char));
+        if(nom == NULL){
+            perror("Erreur d'allocation mémoire pour le nom du client");
+            exit(EXIT_FAILURE);
+        }
+        strcpy(nom, buffer);
+        return nom;
+    }else if(nom_recu == 0){
+        printf("Le client a fermé la connexion avant d'envoyé son nom\n");
+    }else{
+        perror("Erreur lors de la réception du nom du client");
+    }
+    return NULL; // retourner NULL dans le cas d'erreur
+}
+
 // Distribuer les cartes aux joueurs
 void distribuer_cartes_clients(Etats_Jeu *jeu, Client *clients, int nb_joueurs)
 {
@@ -72,7 +96,8 @@ void distribuer_cartes_clients(Etats_Jeu *jeu, Client *clients, int nb_joueurs)
 
     // Distribuer les cartes aux joueurs avec la méthode du jeu
     int pile_indice = 0;
-    distribuer_cartes(jeu, jeu->cartes, &pile_indice);
+    demarrer_manche(jeu, jeu->cartes, &pile_indice);
+    //distribuer_cartes(jeu, jeu->cartes, &pile_indice);
 
     // Envoyer les cartes aux joueurs via le réseau
     for (int i = 0; i < nb_joueurs; i++)
@@ -159,7 +184,7 @@ void gerer_tours(Etats_Jeu *jeu, Client *clients, int nb_joueurs, int *indice_pi
                 int carte_jouee;
                 if (recv(clients[i].socket, &carte_jouee, sizeof(int), 0) > 0)
                 {
-                    printf("Joueur %d a joué la carte : %d\n", clients[i].joueur.id, carte_jouee);
+                    printf("%s a joué la carte : %d\n", clients[i].joueur.nom, carte_jouee);
 
                     // Vérifier la carte jouée
                     if (!verifier_manche(jeu, carte_jouee, indice_pile))
@@ -221,15 +246,26 @@ void boucle_principale(int serveur_socket)
             printf("En attente de joueurs ... \n");
             // Accepter une nouvelle connexion
             int client_socket = accepter_connexion(serveur_socket);
-            if (client_socket > 0)
+
+            // Recevoir le nom du client connecté
+            char *nom_client = recevoir_nom_client(client_socket);
+            if (client_socket > 0 && nom_client != NULL)
             {
                 // Ajouter un client et l'initialiser comme joueur
                 clients[nb_clients].socket = client_socket;
-                initialiser_joueur(&(clients[nb_clients].joueur), nb_clients + 1);
+                strcpy(clients[nb_clients].joueur.nom, nom_client);
+
+            
+                initialiser_joueur(&(clients[nb_clients].joueur), nb_clients + 1, nom_client);
                 nb_clients++;
+
+                free(nom_client);
+
                 printf("Joueur ajouté. Nombre total : %d\n", nb_clients);
-                snprintf(buffer, TAILLE_BUFFER, "Bienvenue joueur %d ! En attente des autres joueurs...\n", nb_clients);
+                snprintf(buffer, TAILLE_BUFFER, "Bienvenue %s! En attente des autres joueurs...\n", clients[nb_clients - 1].joueur.nom);
                 send(client_socket, buffer, strlen(buffer), 0);
+            }else{
+                close(client_socket);
             }
         }
 
@@ -252,8 +288,8 @@ void boucle_principale(int serveur_socket)
                 if (indice_pile >= jeu.nb_cartes)
                 {
                     printf("Manche réussie ! Distribution de cartes supplémentaires.\n");
-                    jeu.nb_cartes++; // Augmenter le nombre de cartes pour la manche suivante
-                    indice_pile = 0; // Réinitialiser l'indice de pile
+                    //jeu.niveau++; // Passage au niveau suivant
+                    //indice_pile = 0; // Réinitialiser l'indice de pile
                     distribuer_cartes_clients(&jeu, clients, nb_clients);
                 }
             }

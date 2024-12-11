@@ -21,8 +21,8 @@ int main(){
 
     printf("\nMéthode << initialiser_joueur >>\n");
     Joueur joueur;
-    initialiser_joueur(&joueur, 1);
-    printf("ID joueur : %d, Nombre de cartes :%d\n", joueur.id, joueur.nb_cartes);
+    initialiser_joueur(&joueur, 1, "Alice");
+    printf("Nom joueur : %s, ID joueur : %d, Nombre de cartes :%d\n",joueur.nom, joueur.id, joueur.nb_cartes);
     if(joueur.main == NULL){ // Donc l'initialisation est correcte
         printf("La main du joueur est vide :3\n");
     }
