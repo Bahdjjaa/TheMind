@@ -43,24 +43,34 @@ void definir_nom_joueur(Joueur *joueur, int joueur_id, const char *nom){
     joueur->id= joueur_id;
     strncpy(joueur->nom, nom, 50);
     joueur->nom[49]= '\0';
-    printf("Nom du joueur %d défini : %s\n");
+    printf("nom du joueur %d défini : %s\n",joueur_id,joueur->nom);
 }
 
 
-// Fonction pour envoyer l'action du joueur (carte jouée)
-void envoyer_action(int sockfd, const char *nom_joueur, int carte_jouee) {
-    char action[100];
-    snprintf(action, sizeof(action), "Joueur %s a joué la carte %d", nom_joueur, carte_jouee);
-    if (send(sockfd, action, strlen(action), 0) < 0) {
-        perror("Erreur lors de l'envoi de l'action");
+// Fonction pour envoyer le nom du joueur
+void envoyer_nom_joueur(int sockfd, const char *nom_joueur){
+    if (send(sockfd, nom_joueur, strlen(nom_joueur) + 1, 0) < 0){
+        perror("Erreur lors de l'envoi du nom");
+        close(sockfd);
+        exit(EXIT_FAILURE);
     }
+    printf("Nom du joueur envoyé au serveur : %s\n", nom_joueur);
 }
+
 
  //Fonction principale du  client
  void boucle_principale_client(int sockfd , const char *nom_joueur)
  {
     char buffer[BUFSIZ];
     int cartes_recues[BUFSIZ];
+
+
+    //Definir le joueur (initialiser la structure)
+    Joueur joueur;
+    definir_nom_joueur(&joueur, 1, nom_joueur);
+
+    //envoyer le nom du joueur au serveur
+    envoyer_nom_joueur(sockfd, joueur.nom);
 
     while (1)
     {
@@ -85,15 +95,27 @@ void envoyer_action(int sockfd, const char *nom_joueur, int carte_jouee) {
                 }
                 printf("\n");
 
-                //Jouer une carte (par exemple, choisir la première carte par défaut)
-                int carte_jouee = cartes_recues[0]; //on demande au joueur quel nombre il veut mettre selon ce qu'il y a dans sa main
-                printf("Vous jouez la carte : %d\n", carte_jouee);
+                //Demander au joueur de choisir un nombre parmi ses cartes
+                int carte_jouee = -1;
+                while(carte_jouee < 0 || carte_jouee >= nb_Cartes){
+                    printf("Choisissez une carte à jouer (numero entre 0 et %d):", nb_Cartes - 1);
+                    scanf("%d", &carte_jouee);
 
-                //Envoi du nom du joueur et de la carte jouée
-                envoyer_action(sockfd, nom_joueur, carte_jouee);
+                    //verifier que le choix est dans les limites des indices des cartes
+                    if (carte_jouee < 0 || carte_jouee >= nb_Cartes){
+                        printf("Choix invalide, veuillez entrer un numéro valide de carte.\n"); 
+                    }
+                    else{
+                        // Le joueur a choisi un index invalide, on peut lui indiquer quelle carte il joue
+                        printf("vous jouez la carte : %d\n", cartes_recues[carte_jouee]);
+                    }
+
+                }
+
+               
 
                 //Envoyer la carte jouée au serveur
-                if (send(sockfd, &carte_jouee, sizeof(int), 0) < 0)
+                if (send(sockfd, &cartes_recues[carte_jouee], sizeof(int), 0) < 0)
                 {
                     perror("erreur lors de l'envoi de la carte");
                     break;
