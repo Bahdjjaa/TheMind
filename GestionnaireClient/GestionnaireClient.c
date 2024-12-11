@@ -161,10 +161,3 @@ void envoyer_nom_joueur(int sockfd, const char *nom_joueur){
     return EXIT_SUCCESS;
 
  }  
-
-
-
-
-
-
-
