@@ -4,12 +4,13 @@
 //fonction pour initialiser le socket et se connecter au serveur
 int initialiser_socket(const char *adress_ip, int port);
 
-//fonction pour envoyer une action au serveur
-void envoyer_action(int sockfd, const char *nom, int carte);
+//Definir le nom du joueur
+void definir_nom_joueur(Joueur *joueur, int joueur_id, const char *nom);
 
-//Fonction pour recevoir l'etat du jeu ou les transformation du serveur
-void recevoir_etat(int sockfd);
+//Envoyer le nom du joueur
+void envoyer_nom_joueur(int sockfd, const char *nom_joueur);
 
-//void fermer_connexion(int sockfd);
+//boucle principale du joueur
+ void boucle_principale_client(int sockfd , const char *nom_joueur)
 
 #endif
