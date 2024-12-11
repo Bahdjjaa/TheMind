@@ -32,6 +32,27 @@ typedef struct
     int nb_cartes; // Nombres de cartes distribuées
 } Etats_Jeu;
 
+
+/* ===== Partie collection de données ==== */
+typedef struct
+{
+    Joueur joueur;  // Information du joueur
+    int manches_reussies; // Nombre de manches réussies dans la partie
+    int valeur_echec; // Valeur de la carte ayant causé un échec
+    float temps_reaction; //Temp de réaction moyen (en secondes)
+} StatJoueur; 
+
+typedef struct 
+{
+    int id_partie;  // ID unique de la partie
+    int total_manches; // Total des manches jouées
+    StatJoueur stat_joueurs[4]; // Tables des stats des joueurs
+    int* vals_echec;
+    int nb_joueurs; // Nombre total de joueurs
+}StatPartie;
+
+/* ===== Fin Partie collection de données ==== */
+
 // Méthode pour générer les carte aléatoirement
 void generer_cartes(Carte* pile);
 
@@ -43,6 +64,15 @@ void initialiser_joueur(Joueur *joueur, int id, const char *nom);
 
 // Méthode pour initialiser l'état du jeu
 void initialiser_jeu(Etats_Jeu *etat, int nb_joueurs, int vies, int shurikens);
+
+// Méthode pour initialiser les statiqtiques de la partie
+void initialiser_stats_partie(Etats_Jeu *jeu,StatPartie *stats,int id);
+
+// Méthode pour mettre à jour les statistiques
+void mettre_a_jour_statistiques(StatPartie *stats, int id_joueur, int manche_reussie, int valeur_echec, float temps_reaction);
+
+// Méthode pour sauvgarder les statistiques dans un fichier text
+void sauvegarder_statistiques(StatPartie *stats);
 
 // Méthode pour distribuer les cartes aux joueurs
 void distribuer_cartes(Etats_Jeu *etat,Carte* pile, int *pile_indice);
@@ -61,5 +91,6 @@ void afficher_cartes(const Carte *cartes, int nb_cartes);
 
 // Méthode pour afficher l'état du jeu
 void afficher_etat_jeu(const Etats_Jeu *jeu);
+
 
 #endif

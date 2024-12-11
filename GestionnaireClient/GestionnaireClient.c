@@ -59,10 +59,28 @@ void envoyer_nom_joueur(int sockfd, const char *nom_joueur){
 
 
 
+ int main(int argc, char *argv[])
+ {
+    if (argc !=4)
+    {
+        fprintf(stderr, "Usage: %s <adresse_ip> <port>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+    
+    const char *adress_ip = argv[1];
+    int port = atoi(argv[2]);
+     const char *nom_joueur = argv[3]; //on recupere le nom du joueur
+
+    // Se connecter au serveur
+    int client_socket = initialiser_socket(adress_ip, port);
+    if(client_socket == -1)
+    {
+        return EXIT_FAILURE; 
+    }
 
 
+    //lancer la boucle principale du client
+    boucle_principale_client(client_socket,nom_joueur);
+    return EXIT_SUCCESS;
 
-
-
-
-
+ }  
