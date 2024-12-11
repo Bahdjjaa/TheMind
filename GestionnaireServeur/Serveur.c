@@ -78,7 +78,7 @@ void distribuer_cartes_clients(Etats_Jeu *jeu, Client *clients, int nb_joueurs)
     for (int i = 0; i < nb_joueurs; i++)
     {
         int nb_cartes = clients[i].joueur.nb_cartes;
-        int cartes_a_envoyees[nb_cartes];
+        int *cartes_a_envoyees = malloc(nb_cartes * sizeof(int));
 
         // Tableau des numéros de cartes à envoyer
         for (int j = 0; j < nb_cartes; j++)
@@ -91,6 +91,7 @@ void distribuer_cartes_clients(Etats_Jeu *jeu, Client *clients, int nb_joueurs)
         {
             perror("Erreur lors de l'envoi des cartes au client");
             close(clients[i].socket);
+            free(cartes_a_envoyees);
             continue;
         }
         else

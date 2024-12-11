@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 // Générer les cartes aléatoirement
 void generer_cartes(Carte* pile){
@@ -39,22 +40,41 @@ void initialiser_jeu(Etats_Jeu *jeu, int nb_joueurs, int vies, int shurikens){
     for(int i = 0; i < nb_joueurs; i++){
         initialiser_joueur(&jeu->joueurs[i], i+1);
     }
-    jeu->cartes = malloc(NB_CARTES_TOTAL * sizeof(Carte));
-    jeu->nb_cartes = NB_CARTES_TOTAL;
 }
 
 
 void distribuer_cartes(Etats_Jeu *jeu, Carte* pile, int *pile_indice){
+
+    // Allouer suffisamment d'espace pour toutes les cartes distribuées
+    jeu->nb_cartes = jeu->nb_joueurs * jeu->niveau;
+    jeu->cartes = malloc(jeu->nb_cartes * sizeof(Carte));
+
+    // Pour savoir combien de cartes ont été utilisées
+    int cartes_utilisees = 0;
+
     for(int i = 0; i < jeu->nb_joueurs; i++){
         jeu->joueurs[i].nb_cartes = jeu->niveau; // Chaque joueur reçoit 'niveau' cartes
         jeu->joueurs[i].main = malloc(jeu->niveau * sizeof(Carte)); // Allocation mémoire pour les cartes
-        jeu->cartes = pile;
 
+        if(jeu->joueurs[i].main == NULL){
+            perror("Erreur lors de l'allocation mémoire pour la main du joueur");
+            exit(EXIT_FAILURE);
+        }
+
+        // Donner les cartes aux joueurs
         for(int j = 0; j < jeu->niveau; j++){
-            jeu->joueurs[i].main[j] = pile[*pile_indice]; //Donner la carte suivate de la pile
+            Carte carte_distribuee = pile[*pile_indice];
+            jeu->joueurs[i].main[j] = carte_distribuee; 
+
+            // Mettre à jour les cartes distribuées dans jeu->cartes
+            jeu->cartes[cartes_utilisees] = carte_distribuee;
+            cartes_utilisees++;
             (*pile_indice)++;
         }
     }
+
+    // Ordonner les cartes distribuées pour les tester plus tard
+    ordonner_cartes(jeu->cartes, jeu->nb_cartes); 
 }
 
 void ordonner_cartes(Carte *pile, int nb_cartes){
@@ -103,7 +123,7 @@ void demarrer_manche(Etats_Jeu *jeu, Carte* pile, int *pile_indice){
     printf("Manche %d commencée\n", jeu->niveau);
 
     for(int i = 0; i < jeu->nb_joueurs; i++){
-        printf("Joueur %d :", jeu->joueurs[i].id);
+        printf("Joueur %d : ", jeu->joueurs[i].id);
             afficher_cartes(jeu->joueurs[i].main, jeu->joueurs[i].nb_cartes);
     }
 }
