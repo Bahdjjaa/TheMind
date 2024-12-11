@@ -19,12 +19,9 @@ int initialiser_serveur(const char *adresse_ip, int port);
 // Méthode pour accepter les connexions clieint
 int accepter_connexion(int serveur_socket);
 
-<<<<<<< HEAD
 // Méthode pour recevoir le nom d'un client
 char* recevoir_nom_client(int client_socket);
 
-=======
->>>>>>> 170e46b (Modification dans GestionnaireClient)
 // Méthode pour envoyer les cartes au joueurs
 void distribuer_cartes_clients(Etats_Jeu *jeu, Client *clients, int nb_joueurs);
 

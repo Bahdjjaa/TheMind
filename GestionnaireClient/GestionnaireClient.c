@@ -1,12 +1,12 @@
 #include "GestionnaireClient.h"
-#include<stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-s
+
 
 // Définir la structure du joueur avec le champ vie
 typedef struct Joueur {
