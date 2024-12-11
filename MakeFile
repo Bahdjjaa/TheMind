@@ -1,0 +1,30 @@
+#compiler 
+CC = gcc
+CFLAGS = -Wall -g
+
+#Fichiers du client
+CLIENT_OBJS = GestionnaireClient/ClientHumain.c GestionnaireClient/ClientRobot.c GestionnaireClient/GestionnaireClient.c
+CLIENT_HEADERS = GestionnaireClient/GestionnaireClient.h GestionnaireClient/ClientHumain.h GestionnaireClient/ClientRobot.h
+
+
+#fichiers du serveur
+SERVEUR_OBJS = GestionnaireServeur/Serveur.c GestionnaireServeur/jeu.c GestionnaireServeur/TestJeu.c GestionnaireServeur/TestServeur
+SERVEUR_HEADERS = GestionnaireServeur/Serveur.h GestionnaireServeur/jeu.h 
+
+#Exécutable
+CLIENT_EXE = GestionnaireClient
+SERVEUR_EXE = GestionnaireServeur
+
+all: $(GESTIONNAIRECLIENT_EXE) $(GESTIONNAIRESERVEUR_EXE)
+
+#compilation du client 
+$(CLIENT_EXE): $(CLIENT_OBJS) $(CLIENT_HEADERS) $(CC) $(CFLAGS) -o $@ $(CLIENT_OBJS)
+
+#Compilation du serveur
+$(SERVEUR_EXE): $(SERVEUR_OBJS) 
+    $(CC) $(CFLAGS) -o $@ $(SERVEUR_OBJS)
+
+#Nettoyer les fichiers compilés 
+clean:
+    rm -f $(CLIENT_EXE) $(SERVEUR_EXE) *.o
+	
