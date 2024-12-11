@@ -65,6 +65,7 @@ int accepter_connexion(int serveur_socket)
     return client_socket;
 }
 
+// Recevoir le nom d'un client
 char* recevoir_nom_client(int client_socket){
     char buffer[TAILLE_NOM_JOUEUR];
     ssize_t nom_recu = recv(client_socket, buffer, TAILLE_NOM_JOUEUR -1, 0);
