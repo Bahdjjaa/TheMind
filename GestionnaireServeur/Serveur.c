@@ -138,8 +138,8 @@ void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, Client *clients, int nb_joueu
     fd_set sockets_lecture;
     // timeout : délai de réponse
     // temps_initial, temps_final : pour calculer le délai de réponse de chaque joueur
-    struct timeval timeout, temps_initial, temps_final;
-    double temps_reaction; // Pour strocker le temps de réaction
+    struct timeval timeout/*, temps_initial, temps_final*/;
+    //double temps_reaction; // Pour strocker le temps de réaction
     char buffer[TAILLE_BUFFER];
     int max_fd = 0;
 
@@ -148,7 +148,7 @@ void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, Client *clients, int nb_joueu
     timeout.tv_usec = 0;
 
     // Capturer le temps initial avant de commencer à écouter
-    gettimeofday(&temps_initial, NULL);
+    //gettimeofday(&temps_initial, NULL);
 
     while (*indice_pile < jeu->nb_cartes && jeu->vies > 0)
     {
@@ -196,9 +196,9 @@ void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, Client *clients, int nb_joueu
                     printf("%s a joué la carte : %d\n", clients[i].joueur.nom, carte_jouee);
 
                     // Capturer le temp de l'envoie de la réponse
-                    gettimeofday(&temps_final, NULL);
-                    temps_reaction = (temps_final.tv_sec - temps_initial.tv_sec) + 
-                                    (temps_final.tv_usec - temps_final.tv_usec) / 1000000.0;
+                    //gettimeofday(&temps_final, NULL);
+                    //temps_reaction = (temps_final.tv_sec - temps_initial.tv_sec) + 
+                    //                (temps_final.tv_usec - temps_final.tv_usec) / 1000000.0;
 
                     // Vérifier la carte jouée
                     if (!verifier_manche(jeu, carte_jouee, indice_pile))
@@ -215,7 +215,7 @@ void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, Client *clients, int nb_joueu
 
                         /*****Mettre à jour le valeur qui a causé l'échec******/
                         /*****Mettre à jour le temp de réaction******/
-                        mettre_a_jour_statistiques(stats, i, 0, carte_jouee, temps_reaction);
+                        //mettre_a_jour_statistiques(stats, i, 0, carte_jouee, temps_reaction);
                         return;
                     }
 
@@ -229,7 +229,7 @@ void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, Client *clients, int nb_joueu
 
                     /*****Mettre à jour le nombre de cartes jouées correctement pour le joueur******/
                     /*****Mettre à jour le temp de réaction******/
-                    mettre_a_jour_statistiques(stats, i, 2, 0, temps_reaction);
+                    //mettre_a_jour_statistiques(stats, i, 2, 0, temps_reaction);
 
                     break;
                 }
@@ -250,7 +250,7 @@ void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, Client *clients, int nb_joueu
 
             /*****Mettre à jour le nombre de manches réussies pour tous mes joueurs******/
             /*****Mettre à jour le nombre total de manches******/
-            mettre_a_jour_statistiques(stats, i, 1, 0, 0.0);
+            //mettre_a_jour_statistiques(stats, i, 1, 0, 0.0);
         }
     }
 }
@@ -337,7 +337,7 @@ void boucle_principale(int serveur_socket)
             }
 
             /* Sauvgarder les statistiques*/
-            sauvegarder_statistiques(&stats);
+            //sauvegarder_statistiques(&stats);
 
             break; // Quitter la boucle principale
         }

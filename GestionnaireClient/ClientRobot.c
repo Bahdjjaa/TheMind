@@ -5,11 +5,18 @@
 #include <unistd.h>
 
 //boucle principale pour le joueur robot
-void boucle_principale_client_robot(int sockfd){
+void boucle_principale_client_robot(int sockfd, const char *nom){
     char buffer[BUFSIZ];
     int cartes_recues[BUFSIZ];
 
     printf("Joueur robot connecté au serveur .\n");
+
+    //Definir le joueur (initialiser la structure)
+    Joueur joueur;
+    definir_nom_joueur(&joueur, 1, nom);
+
+    //envoyer le nom du joueur au serveur
+    envoyer_nom_joueur(sockfd, joueur.nom);
 
     while(1){
         memset(buffer, 0, sizeof(buffer));

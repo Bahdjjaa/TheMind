@@ -17,7 +17,4 @@ void definir_nom_joueur(Joueur *joueur, int joueur_id, const char *nom);
 //Envoyer le nom du joueur
 void envoyer_nom_joueur(int sockfd, const char *nom_joueur);
 
-//boucle principale du joueur
- void boucle_principale_client(int sockfd , const char *nom_joueur);
-
 #endif
