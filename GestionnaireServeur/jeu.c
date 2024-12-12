@@ -100,7 +100,10 @@ void mettre_a_jour_statistiques(StatPartie *stats, int id_joueur, int manche_reu
 // Sauvgarder les statisqtiques dans un fochiers
 void sauvegarder_statistiques(StatPartie *stats)
 {
-    FILE *fd = fopen("stats_patie.txt", "a");
+    char chemin_fichier[256];
+    snprintf(chemin_fichier, sizeof(chemin_fichier),"../GestionnaireStatistiques/stats_partie.txt");
+
+    FILE *fd = fopen(chemin_fichier, "a");
     if (fd == NULL)
     {
         perror("Erreur lors de l'ouverture du fichier de statistiques");
@@ -129,6 +132,13 @@ void sauvegarder_statistiques(StatPartie *stats)
 
     fprintf(fd, "==================================\n");
     fclose(fd);
+
+    /**** Partie génération du PDF des statistiques****/
+    // Donner les permission d'exécution au script automatisation.sh
+    system("chmod +x ../GestionnaireStatistiques/automatisation.sh");
+
+    // Lancer le script automatisation.sh
+    system("cd ../GestionnaireStatistiques/automatisation.sh && ./automatisation.sh");
 }
 
 void distribuer_cartes(Etats_Jeu *jeu, Carte *pile, int *pile_indice)
