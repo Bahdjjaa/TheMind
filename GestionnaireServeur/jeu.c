@@ -54,9 +54,9 @@ void initialiser_jeu(Etats_Jeu *jeu, int nb_joueurs, int vies, int shurikens)
 }
 
 // Initialiser les statistiques de la partie
-void initialiser_stats_partie(Etats_Jeu *jeu, StatPartie *stats, int id)
+void initialiser_stats_partie(Etats_Jeu *jeu, StatPartie *stats)
 {
-    stats->id_partie = id;
+    //stats->id_partie = id;
     stats->total_manches = 0;
     stats->nb_joueurs = jeu->nb_joueurs;
     stats->vals_echec = malloc(NB_CARTES_TOTAL * sizeof(int));
@@ -72,25 +72,29 @@ void initialiser_stats_partie(Etats_Jeu *jeu, StatPartie *stats, int id)
     {
         stats->stat_joueurs[i].joueur = jeu->joueurs[i];
         stats->stat_joueurs[i].manches_reussies = 0;
-        stats->stat_joueurs[i].valeur_echec = 0;
+        stats->stat_joueurs[i].nb_vals_echec = 0;
+        stats->stat_joueurs[i].nb_vals_correctes = 0;
         stats->stat_joueurs[i].temps_reaction = 0.0;
     }
 }
 
 // Mettre à jour les statistiques
-void mettre_a_jour_statistiques(StatPartie *stats, int id_joueur, int manche_reussie, int valeur_echec, float temps_reaction)
+void mettre_a_jour_statistiques(StatPartie *stats, int id_joueur, int manche_reussie, int valeur_echec, double temps_reaction)
 {
-    if (manche_reussie)
+    if (manche_reussie == 1) /*Fin de la manche, toutes mes cartes jouées sont correctes*/
     {
         stats->stat_joueurs[id_joueur].manches_reussies++;
         stats->total_manches++;
+    } else if(manche_reussie == 2){ /*La manche n'est pas encore réussie mais la valeur envoyée est correcte*/
+        stats->stat_joueurs[id_joueur].nb_vals_correctes++; // Incrémenter le nombre de valeurs correctes jouées
+        stats->stat_joueurs[id_joueur].temps_reaction += temps_reaction; // Pour calculer la moyenne
     }
-    else
+    else /*La carte jouée a causé l'échec*/
     {
-        stats->stat_joueurs[id_joueur].valeur_echec = valeur_echec;
+        stats->stat_joueurs[id_joueur].nb_vals_echec++;
         stats->vals_echec[valeur_echec - 1]++; // Incrémenter le nombre de fois que la valeur à causer l'échec
+        stats->stat_joueurs[id_joueur].temps_reaction += temps_reaction; // Pour calculer la moyenne
     }
-    stats->stat_joueurs[id_joueur].temps_reaction += temps_reaction; // Pour calculer la moyenne
 }
 
 // Sauvgarder les statisqtiques dans un fochiers
@@ -103,7 +107,7 @@ void sauvegarder_statistiques(StatPartie *stats)
         return;
     }
     fprintf(fd, "=== STATISTIQUES DE LA PARTIE ===\n");
-    fprintf(fd, "ID Partie: %d\n", stats->id_partie);
+    //fprintf(fd, "ID Partie: %d\n", stats->id_partie);
     fprintf(fd, "Total Manches: %d\n", stats->total_manches);
     fprintf(fd, "Nombre de joueurs: %d\n", stats->nb_joueurs);
 
@@ -112,7 +116,8 @@ void sauvegarder_statistiques(StatPartie *stats)
         StatJoueur *s = &stats->stat_joueurs[i];
         fprintf(fd, "Joueur: %s\n", s->joueur.nom);
         fprintf(fd, "Manches réussies: %d\n", s->manches_reussies);
-        fprintf(fd, "Valeur échec: %d\n", s->valeur_echec);
+        fprintf(fd, "Le nombre de fois qu'il a joué une carte correcte: %d\n", s->nb_vals_correctes);
+        fprintf(fd, "Le nombre de fois qu'il a causé l'échec échec: %d\n", s->nb_vals_echec);
         fprintf(fd, "Temps réaction moyenne: %.2f\n", s->temps_reaction / stats->total_manches);
     }
 

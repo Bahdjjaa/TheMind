@@ -38,13 +38,14 @@ typedef struct
 {
     Joueur joueur;  // Information du joueur
     int manches_reussies; // Nombre de manches réussies dans la partie
-    int valeur_echec; // Valeur de la carte ayant causé un échec
-    float temps_reaction; //Temp de réaction moyen (en secondes)
+    int nb_vals_echec; // Le nombre de valeurs que le joueurs a mal joué
+    int nb_vals_correctes; // Le nombre de valeurs que le joueurs a joué correctement
+    double temps_reaction; //Temp de réaction moyen (en secondes)
 } StatJoueur; 
 
 typedef struct 
 {
-    int id_partie;  // ID unique de la partie
+    /*int id_partie;  // ID unique de la partie*/
     int total_manches; // Total des manches jouées
     StatJoueur stat_joueurs[4]; // Tables des stats des joueurs
     int* vals_echec;
@@ -66,10 +67,10 @@ void initialiser_joueur(Joueur *joueur, int id, const char *nom);
 void initialiser_jeu(Etats_Jeu *etat, int nb_joueurs, int vies, int shurikens);
 
 // Méthode pour initialiser les statiqtiques de la partie
-void initialiser_stats_partie(Etats_Jeu *jeu,StatPartie *stats,int id);
+void initialiser_stats_partie(Etats_Jeu *jeu,StatPartie *stats);
 
 // Méthode pour mettre à jour les statistiques
-void mettre_a_jour_statistiques(StatPartie *stats, int id_joueur, int manche_reussie, int valeur_echec, float temps_reaction);
+void mettre_a_jour_statistiques(StatPartie *stats, int id_joueur, int manche_reussie, int valeur_echec, double temps_reaction);
 
 // Méthode pour sauvgarder les statistiques dans un fichier text
 void sauvegarder_statistiques(StatPartie *stats);
