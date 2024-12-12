@@ -66,27 +66,33 @@ int accepter_connexion(int serveur_socket)
     return client_socket;
 }
 
-
 // Recevoir le nom d'un client
-char* recevoir_nom_client(int client_socket){
+char *recevoir_nom_client(int client_socket)
+{
     char buffer[TAILLE_NOM_JOUEUR];
-    ssize_t nom_recu = recv(client_socket, buffer, TAILLE_NOM_JOUEUR -1, 0);
+    ssize_t nom_recu = recv(client_socket, buffer, TAILLE_NOM_JOUEUR - 1, 0);
 
-    if(nom_recu > 0){
-        buffer[nom_recu] = '\0'; //Assurer que le nom est nul terminé
+    if (nom_recu > 0)
+    {
+        buffer[nom_recu] = '\0'; // Assurer que le nom est nul terminé
         printf("Nom du client connecté : %s\n", buffer);
 
         // Allocation mémpire pour le nom
         char *nom = malloc((nom_recu + 1) * sizeof(char));
-        if(nom == NULL){
+        if (nom == NULL)
+        {
             perror("Erreur d'allocation mémoire pour le nom du client");
             exit(EXIT_FAILURE);
         }
         strcpy(nom, buffer);
         return nom;
-    }else if(nom_recu == 0){
+    }
+    else if (nom_recu == 0)
+    {
         printf("Le client a fermé la connexion avant d'envoyé son nom\n");
-    }else{
+    }
+    else
+    {
         perror("Erreur lors de la réception du nom du client");
     }
     return NULL; // retourner NULL dans le cas d'erreur
@@ -99,47 +105,76 @@ void distribuer_cartes_clients(Etats_Jeu *jeu, Client *clients, int nb_joueurs)
 
     // Distribuer les cartes aux joueurs avec la méthode du jeu
     int pile_indice = 0;
-    demarrer_manche(jeu, jeu->cartes, &pile_indice);
-    //distribuer_cartes(jeu, jeu->cartes, &pile_indice);
+    Carte *pile = malloc(NB_CARTES_TOTAL * sizeof(Carte));
+    generer_cartes(pile);                   // Générer les cartes du jeu
+    melanger_cartes(pile, NB_CARTES_TOTAL); // Mélanger les cartes du jeu
+    demarrer_manche(jeu, pile, &pile_indice);
 
     // Envoyer les cartes aux joueurs via le réseau
     for (int i = 0; i < nb_joueurs; i++)
     {
         int nb_cartes = clients[i].joueur.nb_cartes;
-        int *cartes_a_envoyees = malloc(nb_cartes * sizeof(int));
+        int *cartes_a_envoyer = malloc(nb_cartes * sizeof(int));
 
         // Tableau des numéros de cartes à envoyer
         for (int j = 0; j < nb_cartes; j++)
         {
-            cartes_a_envoyees[j] = clients[i].joueur.main[j].numero;
+            cartes_a_envoyer[j] = clients[i].joueur.main[j].numero;
         }
 
-        // Envoyer les cartes au joueur
-        if (send(clients[i].socket, cartes_a_envoyees, nb_cartes * sizeof(int), 0) < 0)
+        // Envoyer un identifiant pour les cartes
+        snprintf(buffer, TAILLE_BUFFER, "CARTES");
+        if (send(clients[i].socket, buffer, strlen(buffer), 0) < 0)
+        {
+            perror("Erreur lors de l'envoi de l'identifiant CARTES");
+            close(clients[i].socket);
+            free(cartes_a_envoyer);
+            continue;
+        }
+        usleep(100000); // Pause
+
+        // Envoyer le niveau au joueurs
+        printf("Niveau %d\n", jeu->niveau);
+        snprintf(buffer, TAILLE_BUFFER, "Niveau %d", jeu->niveau);
+        for (int i = 0; i < nb_joueurs; i++)
+        {
+            if (send(clients[i].socket, buffer, sizeof(buffer), 0) < 0)
+            {
+                perror("Erreur lors de l'envoie de numéro du niveau");
+            }
+        }
+        usleep(100000);
+
+        // Enoyer les cartes
+        if (send(clients[i].socket, cartes_a_envoyer, nb_cartes * sizeof(int), 0) < 0)
         {
             perror("Erreur lors de l'envoi des cartes au client");
             close(clients[i].socket);
-            free(cartes_a_envoyees);
+            free(cartes_a_envoyer);
             continue;
         }
-        else
+        usleep(100000); // Pause
+
+        // Envoyer le message d'information
+        snprintf(buffer, TAILLE_BUFFER, "Cartes distribuées : [%d cartes]\n", nb_cartes);
+        if (send(clients[i].socket, buffer, strlen(buffer), 0) < 0)
         {
-            snprintf(buffer, TAILLE_BUFFER, "Cartes distribuées : [%d cartes]\n", nb_cartes);
-            send(clients[i].socket, buffer, strlen(buffer), 0);
+            perror("Erreur lors de l'envoi du nombre de cartes distribuées");
         }
+        usleep(100000); // Pause
     }
 
     printf("Cartes distribuées à tous les joueurs.\n");
 }
 
 // Gérer les tours de jeu
-void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, Client *clients, int nb_joueurs, int *indice_pile)
+void gerer_tours(Etats_Jeu *jeu, StatPartie *stats, Client *clients, int nb_joueurs, int *indice_pile)
 {
     fd_set sockets_lecture;
     // timeout : délai de réponse
     // temps_initial, temps_final : pour calculer le délai de réponse de chaque joueur
-    struct timeval timeout/*, temps_initial, temps_final*/;
-    //double temps_reaction; // Pour strocker le temps de réaction
+    struct timeval timeout /*, temps_initial, temps_final*/;
+    // double temps_reaction; // Pour strocker le temps de réaction
     char buffer[TAILLE_BUFFER];
     int max_fd = 0;
 
@@ -148,7 +183,7 @@ void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, Client *clients, int nb_joueu
     timeout.tv_usec = 0;
 
     // Capturer le temps initial avant de commencer à écouter
-    //gettimeofday(&temps_initial, NULL);
+    // gettimeofday(&temps_initial, NULL);
 
     while (*indice_pile < jeu->nb_cartes && jeu->vies > 0)
     {
@@ -196,8 +231,8 @@ void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, Client *clients, int nb_joueu
                     printf("%s a joué la carte : %d\n", clients[i].joueur.nom, carte_jouee);
 
                     // Capturer le temp de l'envoie de la réponse
-                    //gettimeofday(&temps_final, NULL);
-                    //temps_reaction = (temps_final.tv_sec - temps_initial.tv_sec) + 
+                    // gettimeofday(&temps_final, NULL);
+                    // temps_reaction = (temps_final.tv_sec - temps_initial.tv_sec) +
                     //                (temps_final.tv_usec - temps_final.tv_usec) / 1000000.0;
 
                     // Vérifier la carte jouée
@@ -215,7 +250,7 @@ void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, Client *clients, int nb_joueu
 
                         /*****Mettre à jour le valeur qui a causé l'échec******/
                         /*****Mettre à jour le temp de réaction******/
-                        //mettre_a_jour_statistiques(stats, i, 0, carte_jouee, temps_reaction);
+                        // mettre_a_jour_statistiques(stats, i, 0, carte_jouee, temps_reaction);
                         return;
                     }
 
@@ -229,7 +264,7 @@ void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, Client *clients, int nb_joueu
 
                     /*****Mettre à jour le nombre de cartes jouées correctement pour le joueur******/
                     /*****Mettre à jour le temp de réaction******/
-                    //mettre_a_jour_statistiques(stats, i, 2, 0, temps_reaction);
+                    // mettre_a_jour_statistiques(stats, i, 2, 0, temps_reaction);
 
                     break;
                 }
@@ -242,15 +277,17 @@ void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, Client *clients, int nb_joueu
     }
 
     // Si toutes les cartes ont été jouées correctement
-    if(*indice_pile >= jeu->nb_cartes){
+    if (*indice_pile >= jeu->nb_cartes)
+    {
         printf("Manche réussie ! \n");
         snprintf(buffer, TAILLE_BUFFER, "Manche réussie ! Préparez-vous pour la suivante.\n");
-        for (int i = 0; i < nb_joueurs; i++) {
+        for (int i = 0; i < nb_joueurs; i++)
+        {
             send(clients[i].socket, buffer, strlen(buffer), 0);
 
             /*****Mettre à jour le nombre de manches réussies pour tous mes joueurs******/
             /*****Mettre à jour le nombre total de manches******/
-            //mettre_a_jour_statistiques(stats, i, 1, 0, 0.0);
+            // mettre_a_jour_statistiques(stats, i, 1, 0, 0.0);
         }
     }
 }
@@ -258,12 +295,12 @@ void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, Client *clients, int nb_joueu
 // Boucle principale du serveur
 void boucle_principale(int serveur_socket)
 {
-    char buffer[TAILLE_BUFFER]; // Buffer pour envoyer des messages aux clients
+    char buffer[TAILLE_BUFFER];        // Buffer pour envoyer des messages aux clients
     Client clients[MAX_CLIENTS] = {0}; // Tableau pour stocker les clients connecté
-    int indice_pile = 0; // Nombre de cartes au début
-    int nb_clients = 0; // Nombre de clients au début
-    Etats_Jeu jeu; // Structure du jeu
-    StatPartie stats; // Structure des statistiques du jeu
+    //int indice_pile = 0;               // Nombre de cartes au début
+    int nb_clients = 0;                // Nombre de clients au début
+    Etats_Jeu jeu;                     // Structure du jeu
+    StatPartie stats;                  // Structure des statistiques du jeu
 
     // Initialiser l'état du jeu au début
     initialiser_jeu(&jeu, MAX_CLIENTS, NB_VIES, NB_SHURIKENS);
@@ -273,6 +310,7 @@ void boucle_principale(int serveur_socket)
 
     while (1)
     {
+        // Accepter les connexions
         if (nb_clients < MAX_CLIENTS)
         {
             printf("En attente de joueurs ... \n");
@@ -287,7 +325,6 @@ void boucle_principale(int serveur_socket)
                 clients[nb_clients].socket = client_socket;
                 strcpy(clients[nb_clients].joueur.nom, nom_client);
 
-            
                 initialiser_joueur(&(clients[nb_clients].joueur), nb_clients + 1, nom_client);
                 nb_clients++;
 
@@ -296,7 +333,11 @@ void boucle_principale(int serveur_socket)
                 printf("Joueur ajouté. Nombre total : %d\n", nb_clients);
                 snprintf(buffer, TAILLE_BUFFER, "Bienvenue %s! En attente des autres joueurs...\n", clients[nb_clients - 1].joueur.nom);
                 send(client_socket, buffer, strlen(buffer), 0);
-            }else{
+
+                jeu.joueurs[nb_clients - 1] = clients[nb_clients - 1].joueur;
+            }
+            else
+            {
                 close(client_socket);
             }
         }
@@ -310,21 +351,28 @@ void boucle_principale(int serveur_socket)
             distribuer_cartes_clients(&jeu, clients, nb_clients);
 
             // Gérer les tours de jeu
-            while (jeu.vies > 0)
+            /*while (jeu.vies > 0)
             {
-                printf("Début d'une nouvelle manche\n");
-
                 gerer_tours(&jeu, &stats, clients, nb_clients, &indice_pile);
 
                 // Vérifier si la manche est terminée
                 if (indice_pile >= jeu.nb_cartes)
                 {
                     printf("Manche réussie ! Distribution de cartes supplémentaires.\n");
-                    //jeu.niveau++; // Passage au niveau suivant
-                    //indice_pile = 0; // Réinitialiser l'indice de pile
+                    jeu.niveau++; // Passage au niveau suivant
+                    printf("Niveau %d\n", jeu.niveau);
+                    snprintf(buffer, TAILLE_BUFFER, "Niveau %d", jeu.niveau);
+                    // Envoyer le niveau au joueurs
+                    for (int i = 0; i < nb_clients; i++)
+                    {
+                        if (send(clients[i].socket, buffer, sizeof(buffer), 0) < 0)
+                        {
+                            perror("Erreur lors de l'envoie de numéro du niveau");
+                        }
+                    }
                     distribuer_cartes_clients(&jeu, clients, nb_clients);
                 }
-            }
+            }*/
             /* Ajouter la condition dans le cas pù les joueurs ont décidé de terminer la partie */
 
             // Si les joueurs n'ont plus de vies, la partie est terminée
@@ -337,7 +385,7 @@ void boucle_principale(int serveur_socket)
             }
 
             /* Sauvgarder les statistiques*/
-            //sauvegarder_statistiques(&stats);
+            // sauvegarder_statistiques(&stats);
 
             break; // Quitter la boucle principale
         }

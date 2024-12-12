@@ -40,7 +40,7 @@ void initialiser_joueur(Joueur *joueur, int id, const char *nom)
 // Etat du jeu par défaut
 void initialiser_jeu(Etats_Jeu *jeu, int nb_joueurs, int vies, int shurikens)
 {
-    jeu->niveau = 0;
+    jeu->niveau = 1;
     jeu->vies = vies;
     jeu->shurikens = shurikens;
     jeu->nb_joueurs = nb_joueurs;
@@ -143,7 +143,6 @@ void sauvegarder_statistiques(StatPartie *stats)
 
 void distribuer_cartes(Etats_Jeu *jeu, Carte *pile, int *pile_indice)
 {
-
     // Allouer suffisamment d'espace pour toutes les cartes distribuées
     jeu->nb_cartes = jeu->nb_joueurs * jeu->niveau;
     jeu->cartes = malloc(jeu->nb_cartes * sizeof(Carte));
@@ -229,14 +228,13 @@ void afficher_etat_jeu(const Etats_Jeu *jeu)
 
 void demarrer_manche(Etats_Jeu *jeu, Carte *pile, int *pile_indice)
 {
-    jeu->niveau++;                             // Passer au niveau suivant
-    distribuer_cartes(jeu, pile, pile_indice); // Distribuer les cartes
+    distribuer_cartes(jeu, pile, pile_indice); // Distribuer les cartes au niveau du serveur
 
     printf("Manche %d commencée\n", jeu->niveau);
 
     for (int i = 0; i < jeu->nb_joueurs; i++)
     {
-        printf("Joueur %d : ", jeu->joueurs[i].id);
+        printf("Joueur : %s ", jeu->joueurs[i].nom);
         afficher_cartes(jeu->joueurs[i].main, jeu->joueurs[i].nb_cartes);
     }
 }
