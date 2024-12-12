@@ -7,11 +7,11 @@
 #define NB_VIES 2
 #define NB_SHURIKENS 1
 
-typedef struct 
+/*typedef struct 
 {
     int socket; 
     Joueur joueur;
-} Client;
+} Client;*/
 
 // Méthode pour initialiser le serveur
 int initialiser_serveur(const char *adresse_ip, int port);
@@ -23,10 +23,10 @@ int accepter_connexion(int serveur_socket);
 char* recevoir_nom_client(int client_socket);
 
 // Méthode pour envoyer les cartes au joueurs
-void distribuer_cartes_clients(Etats_Jeu *jeu, Client *clients, int nb_joueurs);
+void distribuer_cartes_clients(Etats_Jeu *jeu, /*Client *clients,*/ int nb_joueurs);
 
 // Méthode pour la gestion les tours de jeu
-void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, Client *clients, int nb_joueurs, int *indice_pile);
+void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, /*Client *clients,*/ int nb_joueurs, int *indice_pile);
 
 //Boucle principale du serveur
 void boucle_principale(int serveur_socket);

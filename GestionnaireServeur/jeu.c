@@ -28,9 +28,8 @@ void melanger_cartes(Carte *pile, int nb_cartes)
 }
 
 // Joueur par défaut
-void initialiser_joueur(Joueur *joueur, int id, const char *nom)
+void initialiser_joueur(Joueur *joueur, const char *nom)
 {
-    joueur->id = id;
     joueur->main = NULL;
     strncpy(joueur->nom, nom, sizeof(joueur->nom) - 1);
     joueur->nom[sizeof(joueur->nom) - 1] = '\0';
@@ -49,7 +48,7 @@ void initialiser_jeu(Etats_Jeu *jeu, int nb_joueurs, int vies, int shurikens)
     {
         Joueur joueur = jeu->joueurs[i];
         char *nom = jeu->joueurs[i].nom;
-        initialiser_joueur(&joueur, i + 1, nom);
+        initialiser_joueur(&joueur, nom);
     }
 }
 
@@ -221,7 +220,7 @@ void afficher_etat_jeu(const Etats_Jeu *jeu)
 
     for (int i = 0; i < jeu->nb_joueurs; i++)
     {
-        printf("Joueur %d : ", jeu->joueurs[i].id);
+        printf("%s : ", jeu->joueurs[i].nom);
         afficher_cartes(jeu->joueurs[i].main, jeu->joueurs[i].nb_cartes);
     }
 }

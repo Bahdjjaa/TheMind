@@ -14,7 +14,7 @@ typedef struct
 // Structure représentant un joueur
 typedef struct
 {
-    int id;
+    int socket;
     char nom[TAILLE_NOM_JOUEUR];
     Carte *main; // Pointeur vers les cartes en main
     int nb_cartes; // Nombre de cartes en main
@@ -45,7 +45,6 @@ typedef struct
 
 typedef struct 
 {
-    /*int id_partie;  // ID unique de la partie*/
     int total_manches; // Total des manches jouées
     StatJoueur stat_joueurs[4]; // Tables des stats des joueurs
     int* vals_echec;
@@ -61,7 +60,7 @@ void generer_cartes(Carte* pile);
 void melanger_cartes(Carte* pile, int nb_cartes);
 
 // Méthode pour initialiser un joueur
-void initialiser_joueur(Joueur *joueur, int id, const char *nom);
+void initialiser_joueur(Joueur *joueur, const char *nom);
 
 // Méthode pour initialiser l'état du jeu
 void initialiser_jeu(Etats_Jeu *etat, int nb_joueurs, int vies, int shurikens);
