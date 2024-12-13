@@ -102,7 +102,7 @@ void sauvegarder_statistiques(StatPartie *stats)
     char chemin_fichier[256];
     snprintf(chemin_fichier, sizeof(chemin_fichier),"../GestionnaireStatistiques/stats_partie.txt");
 
-    FILE *fd = fopen(chemin_fichier, "a");
+    FILE *fd = fopen(chemin_fichier, "w");
     if (fd == NULL)
     {
         perror("Erreur lors de l'ouverture du fichier de statistiques");
@@ -243,7 +243,6 @@ int verifier_manche(const Etats_Jeu *jeu, int carte_jouee, int *indice_pile)
     if (carte_jouee == jeu->cartes[*indice_pile].numero)
     {
         // La carte est correcte, on passe à la suivante
-        (*indice_pile)++;
         return 1;
     }
     else

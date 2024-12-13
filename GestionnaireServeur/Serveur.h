@@ -26,7 +26,7 @@ char* recevoir_nom_client(int client_socket);
 void distribuer_cartes_clients(Etats_Jeu *jeu, /*Client *clients,*/ int nb_joueurs);
 
 // Méthode pour la gestion les tours de jeu
-void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, /*Client *clients,*/ int nb_joueurs, int *indice_pile);
+void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, /*Client *clients,*/ int nb_joueurs/*, int *indice_pile*/);
 
 //Boucle principale du serveur
 void boucle_principale(int serveur_socket);
