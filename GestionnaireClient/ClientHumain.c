@@ -8,7 +8,7 @@
 void boucle_principale_client_humain(int sockfd, const char *nom_joueur)
 {
     char buffer[BUFSIZ];
-    int cartes[50];
+    Carte cartes[50];
     int nb_cartes = 0;
 
     // Initialiser le joueur
@@ -25,11 +25,10 @@ void boucle_principale_client_humain(int sockfd, const char *nom_joueur)
         // Initialiser le set de sockets
         FD_ZERO(&sockets_lecture);
         FD_SET(STDIN_FILENO, &sockets_lecture); // Pour la saisie utilisateur
-        FD_SET(sockfd, &sockets_lecture);      // Pour les messages du serveur
+        FD_SET(sockfd, &sockets_lecture);       // Pour les messages du serveur
         int max_fd = sockfd;
 
-        printf("Choisissez une cartes ");
-        
+
         // Attendre l'activité sur stdin ou sockfd
         int activite = select(max_fd + 1, &sockets_lecture, NULL, NULL, NULL);
 
@@ -50,10 +49,24 @@ void boucle_principale_client_humain(int sockfd, const char *nom_joueur)
                 buffer[bytes_recus] = '\0';
                 printf("\nMessage > : %s\n", buffer);
 
+                for(int i = 0; i < 50; i++){
+                    if(cartes[i].num != 0 && cartes[i].est_jouee != 1){
+                            printf("%d ", cartes[i].num);
+                    }
+                }
+                printf("\n");
+
                 // Si le serveur demande de jouer une carte
                 char *token = strtok(buffer, ";");
                 if (strcmp(token, "CARTES") == 0)
                 {
+                    // Vider la pile
+                    for (int i = 0; i < 50; i++)
+                    {
+                        cartes[i].num = 0;
+                        cartes[i].est_jouee = 0;
+                    }
+
                     token = strtok(NULL, ";");
                     nb_cartes = atoi(token);
 
@@ -66,13 +79,14 @@ void boucle_principale_client_humain(int sockfd, const char *nom_joueur)
                         {
                             printf("Message invalide : valeur de carte manquante\n");
                         }
-                        cartes[i] = atoi(token);
+                        cartes[i].num = atoi(token);
+                        cartes[i].est_jouee = 0;
                     }
 
                     printf("Vos cartes: ");
                     for (int i = 0; i < nb_cartes; i++)
                     {
-                        printf("%d ", cartes[i]);
+                        printf("%d ", cartes[i].num);
                     }
                     printf("\n");
                 }
@@ -104,7 +118,7 @@ void boucle_principale_client_humain(int sockfd, const char *nom_joueur)
 
                 if (choix >= 0 && choix < nb_cartes)
                 {
-                    printf("Vous jouez la carte : %d\n", cartes[choix]);
+                    printf("Vous jouez la carte : %d\n", cartes[choix].num);
 
                     // Envoyer la carte jouée au serveur
                     if (send(sockfd, &cartes[choix], sizeof(int), 0) < 0)
@@ -112,6 +126,9 @@ void boucle_principale_client_humain(int sockfd, const char *nom_joueur)
                         perror("Erreur lors de l'envoi de la carte");
                         break;
                     }
+
+                    // Marquer la carte comme jouée
+                    cartes[choix].est_jouee = 1;
                 }
                 else
                 {

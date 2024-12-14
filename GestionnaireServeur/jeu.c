@@ -59,6 +59,7 @@ void initialiser_stats_partie(Etats_Jeu *jeu, StatPartie *stats)
     stats->total_manches = 0;
     stats->nb_joueurs = jeu->nb_joueurs;
     stats->vals_echec = malloc(NB_CARTES_TOTAL * sizeof(int));
+    stats->stat_joueurs = malloc(stats->nb_joueurs * sizeof(StatJoueur));
 
     if (stats->vals_echec == NULL)
     {
@@ -82,7 +83,9 @@ void mettre_a_jour_statistiques(StatPartie *stats, int id_joueur, int manche_reu
 {
     if (manche_reussie == 1) /*Fin de la manche, toutes mes cartes jouées sont correctes*/
     {
-        stats->stat_joueurs[id_joueur].manches_reussies++;
+        for(int i = 0; i < stats->nb_joueurs; i++){
+            stats->stat_joueurs[i].manches_reussies++;
+        }
         stats->total_manches++;
     } else if(manche_reussie == 2){ /*La manche n'est pas encore réussie mais la valeur envoyée est correcte*/
         stats->stat_joueurs[id_joueur].nb_vals_correctes++; // Incrémenter le nombre de valeurs correctes jouées
@@ -100,7 +103,9 @@ void mettre_a_jour_statistiques(StatPartie *stats, int id_joueur, int manche_reu
 void sauvegarder_statistiques(StatPartie *stats)
 {
     char chemin_fichier[256];
-    snprintf(chemin_fichier, sizeof(chemin_fichier),"../GestionnaireStatistiques/stats_partie.txt");
+    snprintf(chemin_fichier, sizeof(chemin_fichier),"GestionnaireStatistiques/stats_partie.txt");
+
+    printf("Chemin du fichier : %s\n", chemin_fichier);
 
     FILE *fd = fopen(chemin_fichier, "w");
     if (fd == NULL)
@@ -109,24 +114,23 @@ void sauvegarder_statistiques(StatPartie *stats)
         return;
     }
     fprintf(fd, "=== STATISTIQUES DE LA PARTIE ===\n");
-    //fprintf(fd, "ID Partie: %d\n", stats->id_partie);
     fprintf(fd, "Total Manches: %d\n", stats->total_manches);
     fprintf(fd, "Nombre de joueurs: %d\n", stats->nb_joueurs);
 
     for (int i = 0; i < stats->nb_joueurs; i++)
     {
         StatJoueur *s = &stats->stat_joueurs[i];
-        fprintf(fd, "Joueur: %s\n", s->joueur.nom);
-        fprintf(fd, "Manches réussies: %d\n", s->manches_reussies);
-        fprintf(fd, "Le nombre de fois qu'il a joué une carte correcte: %d\n", s->nb_vals_correctes);
-        fprintf(fd, "Le nombre de fois qu'il a causé l'échec échec: %d\n", s->nb_vals_echec);
-        fprintf(fd, "Temps réaction moyenne: %.2f\n", s->temps_reaction / stats->total_manches);
+        fprintf(fd, "Joueur: %s \n", s->joueur.nom);
+        fprintf(fd, "Manches réussies: %d \n", s->manches_reussies);
+        fprintf(fd, "Le nombre de fois qu'il a joué une carte correcte: %d \n", s->nb_vals_correctes);
+        fprintf(fd, "Le nombre de fois qu'il a causé l'échec échec: %d \n", s->nb_vals_echec);
+        fprintf(fd, "Temps réaction moyenne: %.2f \n", s->temps_reaction / stats->total_manches);
     }
 
     fprintf(fd, "Le nombre de fois que chaque valeur a causé l'échec: \n");
     for (int i = 0; i < NB_CARTES_TOTAL; i++)
     {
-        fprintf(fd, "%d a causé l'échec %d fois\n", (i + 1), stats->vals_echec[i]);
+        fprintf(fd, "Numéro %d , %d fois \n", (i + 1), stats->vals_echec[i]);
     }
 
     fprintf(fd, "==================================\n");
@@ -134,10 +138,10 @@ void sauvegarder_statistiques(StatPartie *stats)
 
     /**** Partie génération du PDF des statistiques****/
     // Donner les permission d'exécution au script automatisation.sh
-    system("chmod +x ../GestionnaireStatistiques/automatisation.sh");
+    system("chmod +x GestionnaireStatistiques/automatisation.sh");
 
     // Lancer le script automatisation.sh
-    system("cd ../GestionnaireStatistiques/automatisation.sh && ./automatisation.sh");
+    system("cd GestionnaireStatistiques && ./automatisation.sh");
 }
 
 void distribuer_cartes(Etats_Jeu *jeu, Carte *pile, int *pile_indice)

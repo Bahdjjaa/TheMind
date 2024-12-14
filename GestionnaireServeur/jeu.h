@@ -46,7 +46,7 @@ typedef struct
 typedef struct 
 {
     int total_manches; // Total des manches jouées
-    StatJoueur stat_joueurs[4]; // Tables des stats des joueurs
+    StatJoueur* stat_joueurs; // Tables des stats des joueurs
     int* vals_echec;
     int nb_joueurs; // Nombre total de joueurs
 }StatPartie;

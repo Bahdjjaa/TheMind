@@ -8,6 +8,11 @@ typedef struct Joueur{
     char nom[50];
 }Joueur;
 
+typedef struct{
+    int num;
+    int est_jouee;
+} Carte;
+
 //fonction pour initialiser le socket et se connecter au serveur
 int initialiser_socket(const char *adress_ip, int port);
 

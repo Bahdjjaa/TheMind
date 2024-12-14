@@ -230,7 +230,6 @@ void gerer_tours(Etats_Jeu *jeu, StatPartie *stats, int nb_joueurs)
                 for (int i = 0; i < nb_joueurs; i++)
                 {
                     send(jeu->joueurs[i].socket, buffer, strlen(buffer), 0);
-                    close(jeu->joueurs[i].socket); // Fermer les sockets des clients
                 }
             }
             return; // Recommencer la manche
@@ -347,6 +346,7 @@ void boucle_principale(int serveur_socket)
                 // Ajouter un client et l'initialiser comme joueur
                 jeu.joueurs[nb_clients].socket = client_socket; // Affecter la valeur du socket à joueur.socket
                 strcpy(jeu.joueurs[nb_clients].nom, nom_client);
+                strcpy(stats.stat_joueurs[nb_clients].joueur.nom, nom_client); //Mise à jour du nom
 
                 initialiser_joueur(&(jeu.joueurs[nb_clients]), nom_client);
                 nb_clients++;
@@ -373,13 +373,13 @@ void boucle_principale(int serveur_socket)
                 // Distribuer les cartes au client
                 distribuer_cartes_clients(&jeu, nb_clients);
                 gerer_tours(&jeu, &stats, nb_clients);
-                afficher_cartes(jeu.cartes, jeu.nb_cartes);
+                //afficher_cartes(jeu.cartes, jeu.nb_cartes); /*Débogage*/
             }
             break;
             /* Ajouter la condition dans le cas pù les joueurs ont décidé de terminer la partie */
         }
     }
     /* Sauvgarder les statistiques*/
-    sauvegarder_statistiques(&stats);
+    //sauvegarder_statistiques(&stats);
     close(serveur_socket); // Fermer la socket du serveur
 }
