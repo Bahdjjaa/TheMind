@@ -28,7 +28,6 @@ void boucle_principale_client_humain(int sockfd, const char *nom_joueur)
         FD_SET(sockfd, &sockets_lecture);       // Pour les messages du serveur
         int max_fd = sockfd;
 
-
         // Attendre l'activité sur stdin ou sockfd
         int activite = select(max_fd + 1, &sockets_lecture, NULL, NULL, NULL);
 
@@ -49,13 +48,6 @@ void boucle_principale_client_humain(int sockfd, const char *nom_joueur)
                 buffer[bytes_recus] = '\0';
                 printf("\nMessage > : %s\n", buffer);
 
-                for(int i = 0; i < 50; i++){
-                    if(cartes[i].num != 0 && cartes[i].est_jouee != 1){
-                            printf("%d ", cartes[i].num);
-                    }
-                }
-                printf("\n");
-
                 // Si le serveur demande de jouer une carte
                 char *token = strtok(buffer, ";");
                 if (strcmp(token, "CARTES") == 0)
@@ -70,6 +62,10 @@ void boucle_principale_client_humain(int sockfd, const char *nom_joueur)
                     token = strtok(NULL, ";");
                     nb_cartes = atoi(token);
 
+                    if(nb_cartes > 1){
+                        printf("Manche réussie !\n");
+                    }
+                    
                     printf("Vous êtes au niveau %d\n", nb_cartes);
 
                     for (int i = 0; i < nb_cartes; i++)
@@ -83,17 +79,29 @@ void boucle_principale_client_humain(int sockfd, const char *nom_joueur)
                         cartes[i].est_jouee = 0;
                     }
 
-                    printf("Vos cartes: ");
+                    printf("Vos cartes: ======\n");
                     for (int i = 0; i < nb_cartes; i++)
                     {
-                        printf("%d ", cartes[i].num);
+                        printf("Carte %d : %d\n", (i + 1), cartes[i].num);
                     }
-                    printf("\n");
+                    printf("==================\n");
                 }
                 else if (strstr(buffer, "Partie terminée") != NULL)
                 {
                     printf("Fin de la partie.\n");
                     break;
+                }
+                else if (strstr(buffer, "Continuez") == 0)
+                {
+                    printf("Vos cartes: ======\n");
+                    for (int i = 0; i < 50; i++)
+                    {
+                        if (cartes[i].num != 0 && cartes[i].est_jouee != 1)
+                        {
+                            printf("Carte %d : %d\n", (i + 1), cartes[i].num);
+                        }
+                    }
+                    printf("==================\n");
                 }
             }
             else if (bytes_recus == 0)
@@ -112,23 +120,30 @@ void boucle_principale_client_humain(int sockfd, const char *nom_joueur)
         if (FD_ISSET(STDIN_FILENO, &sockets_lecture))
         {
             char saisie[100];
+
             if (fgets(saisie, sizeof(saisie), stdin) != NULL)
             {
                 int choix = atoi(saisie);
 
-                if (choix >= 0 && choix < nb_cartes)
+                if (choix == -1)
                 {
-                    printf("Vous jouez la carte : %d\n", cartes[choix].num);
+                    printf("Vous avez choisi de terminer la partie\n");
+                    break;
+                }
+
+                if (choix >= 1 && choix <= nb_cartes)
+                {
+                    printf("Vous jouez la carte : %d\n", cartes[choix - 1].num);
 
                     // Envoyer la carte jouée au serveur
-                    if (send(sockfd, &cartes[choix], sizeof(int), 0) < 0)
+                    if (send(sockfd, &cartes[choix - 1], sizeof(int), 0) < 0)
                     {
                         perror("Erreur lors de l'envoi de la carte");
                         break;
                     }
 
                     // Marquer la carte comme jouée
-                    cartes[choix].est_jouee = 1;
+                    cartes[choix-1].est_jouee = 1;
                 }
                 else
                 {

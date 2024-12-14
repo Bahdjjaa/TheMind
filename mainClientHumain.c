@@ -3,26 +3,23 @@
 #include <unistd.h>
 #include "GestionnaireClient/ClientHumain.h"
 
-#define ADRESSE_IP "127.0.0.1"
 #define PORT 8080
 
 int main(int argc, char *argv[]){
-    /*
-    if (argc < 2)
+    if (argc < 3)
     {
-        fprintf(stderr, "Usage: %s <port>\n", argv[0]);
+        fprintf(stderr, "Usage: %s <adresse_ip> <nom>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
-    int port = atoi(argv[1]);
-    */
+    char *adresse_ip = argv[1]; // Récupérer l'adresse IP passée en paramètre
+    char *nom = argv[2]; // Récupérer le nom passé en paramètre
 
-   /*Récupérer le nom du client*/
-   char *nom = "Joueur";
 
-    printf("Connexion au serveur %s:%d...\n", ADRESSE_IP, PORT);
 
-    int client_socket = initialiser_socket(ADRESSE_IP, PORT);
+    printf("Connexion au serveur %s:%d...\n", adresse_ip, PORT);
+
+    int client_socket = initialiser_socket(adresse_ip, PORT);
     if(client_socket== -1){
         perror("Erreur lors de l'initialisation du serveur");
         return EXIT_FAILURE;

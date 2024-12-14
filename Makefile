@@ -18,7 +18,7 @@ SERVEUR_HEADERS = GestionnaireServeur/Serveur.h GestionnaireServeur/jeu.h
 SERVEUR_OBJ = $(SERVEUR_SRC:.c=.o)
 
 # Exécutables
-CLIENT_HUMAIN_EXE = client
+CLIENT_HUMAIN_EXE = joueur
 CLIENT_ROBOT_EXE = robot
 SERVEUR_EXE = serveur
 
