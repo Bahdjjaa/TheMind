@@ -97,9 +97,3 @@ Avant de lancer le jeu, assurez-vous d'avoir les outils suivants installés sur 
     ```
 
 ---
-
-## Licence
-
-Ce projet est sous licence [MIT](LICENSE).  
-
----
