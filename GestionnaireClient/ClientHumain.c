@@ -50,7 +50,7 @@ void boucle_principale_client_humain(int sockfd, const char *nom_joueur)
 
                 // Si le serveur demande de jouer une carte
                 char *token = strtok(buffer, ";");
-                if (strcmp(token, "CARTES") == 0)
+                if (strcmp(token, "CARTES") == 0 && strstr(buffer, "PARTIE TERMINÉE") == NULL)
                 {
                     // Vider la pile
                     for (int i = 0; i < 50; i++)
@@ -61,10 +61,6 @@ void boucle_principale_client_humain(int sockfd, const char *nom_joueur)
 
                     token = strtok(NULL, ";");
                     nb_cartes = atoi(token);
-
-                    if(nb_cartes > 1){
-                        printf("Manche réussie !\n");
-                    }
                     
                     printf("Vous êtes au niveau %d\n", nb_cartes);
 
@@ -91,7 +87,7 @@ void boucle_principale_client_humain(int sockfd, const char *nom_joueur)
                     printf("Fin de la partie.\n");
                     break;
                 }
-                else if (strstr(buffer, "Continuez") == 0)
+                else if (strstr(buffer, "Continuez") != NULL)
                 {
                     printf("Vos cartes: ======\n");
                     for (int i = 0; i < 50; i++)

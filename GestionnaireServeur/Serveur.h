@@ -29,6 +29,6 @@ void distribuer_cartes_clients(Etats_Jeu *jeu, /*Client *clients,*/ int nb_joueu
 void gerer_tours(Etats_Jeu *jeu,StatPartie *stats, /*Client *clients,*/ int nb_joueurs/*, int *indice_pile*/);
 
 //Boucle principale du serveur
-void boucle_principale(int serveur_socket);
+void boucle_principale(int serveur_socket, int nb_joueurs);
 
 #endif

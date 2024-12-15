@@ -230,6 +230,7 @@ void gerer_tours(Etats_Jeu *jeu, StatPartie *stats, int nb_joueurs)
             {
                 send(jeu->joueurs[i].socket, buffer, strlen(buffer), 0);
             }
+            jeu->niveau = 1;
 
             if (jeu->vies == 0)
             {
@@ -260,42 +261,63 @@ void gerer_tours(Etats_Jeu *jeu, StatPartie *stats, int nb_joueurs)
                     temps_reaction = (temps_final.tv_sec - temps_initial.tv_sec) +
                                      (temps_final.tv_usec - temps_final.tv_usec) / 1000000.0;
 
-                    if(carte_jouee == -1){
+                    if (carte_jouee == -1)
+                    {
                         snprintf(buffer, TAILLE_BUFFER, "%s a décidé de terminer la partie\n", jeu->joueurs[i].nom);
                         for (int j = 0; j < nb_joueurs; j++)
                         {
-                            if(j!=i){
+                            if (j != i)
+                            {
                                 send(jeu->joueurs[j].socket, buffer, strlen(buffer), 0);
                             }
                         }
-                        break;
+                        jeu->vies = 0;
+                        return;
                     }
                     // Vérifier la carte jouée
                     if (!verifier_manche(jeu, carte_jouee, &nb_cartes_jouees))
                     {
-                        // Informer les jouers de l'échec
-                        snprintf(buffer, TAILLE_BUFFER, "%s a joué la carte %d.. Manche échouée. vous perdez une vie. \n", jeu->joueurs[i].nom, carte_jouee);
-                        nb_cartes_jouees = 0;
-                        for (int j = 0; j < nb_joueurs; j++)
-                        {
-                            send(jeu->joueurs[j].socket, buffer, strlen(buffer), 0);   
-                        }
-
                         // Réinitialiser la manche
                         jeu->vies--;
 
-                        /*****Mettre à jour le valeur qui a causé l'échec******/
-                        /*****Mettre à jour le temp de réaction******/
-                        mettre_a_jour_statistiques(stats, i, 0, carte_jouee, temps_reaction);
-                        return;
+                        if (jeu->vies > 0)
+                        {
+                            /*****Mettre à jour le valeur qui a causé l'échec******/
+                            /*****Mettre à jour le temp de réaction******/
+                            mettre_a_jour_statistiques(stats, i, 0, carte_jouee, temps_reaction);
+
+                            // Informer les jouers de l'échec
+                            snprintf(buffer, TAILLE_BUFFER, "%s a joué la carte %d.. Manche échouée.\nvous perdez une vie. Vies restantes : %d\nRedistribution de cartes dans 3 secondes", jeu->joueurs[i].nom, carte_jouee, jeu->vies);
+                            nb_cartes_jouees = 0;
+                            for (int j = 0; j < nb_joueurs; j++)
+                            {
+                                send(jeu->joueurs[j].socket, buffer, strlen(buffer), 0);
+                            }
+                            sleep(3);
+
+                            jeu->niveau = 1;
+                            return;
+                        }else{
+                            // Informer les jouers de l'échec
+                            snprintf(buffer, TAILLE_BUFFER, "%s a joué la carte %d..\n===PARTIE TERMINÉE===\nVous n'avez plus de vies\n", jeu->joueurs[i].nom, carte_jouee);
+                            nb_cartes_jouees = 0;
+                            for (int j = 0; j < nb_joueurs; j++)
+                            {
+                                send(jeu->joueurs[j].socket, buffer, strlen(buffer), 0);
+                            }
+                            /*****Mettre à jour le valeur qui a causé l'échec******/
+                            /*****Mettre à jour le temp de réaction******/
+                            mettre_a_jour_statistiques(stats, i, 0, carte_jouee, temps_reaction);
+                            return;
+                        }
                     }
 
                     // Informer les joueurs que la carte est correcte
                     nb_cartes_jouees++;
                     snprintf(buffer, TAILLE_BUFFER, "%s a joué une carte %d correcte ! Continuez.\n", jeu->joueurs[i].nom, carte_jouee);
                     for (int j = 0; j < nb_joueurs; j++)
-                    {  
-                        send(jeu->joueurs[j].socket, buffer, strlen(buffer), 0);  
+                    {
+                        send(jeu->joueurs[j].socket, buffer, strlen(buffer), 0);
                     }
 
                     /*****Mettre à jour le nombre de cartes jouées correctement pour le joueur******/
@@ -306,7 +328,7 @@ void gerer_tours(Etats_Jeu *jeu, StatPartie *stats, int nb_joueurs)
                     if (nb_cartes_jouees >= jeu->nb_cartes)
                     {
                         printf("Manche réussie ! \n");
-                        snprintf(buffer, TAILLE_BUFFER, "Manche réussie ! Préparez-vous pour la suivante. (Commence dans 5 secondes)\n");
+                        snprintf(buffer, TAILLE_BUFFER, "Manche réussie ! Préparez-vous pour la suivante.\nRedistibution de cartes dans 3 secondes\n");
                         for (int j = 0; j < nb_joueurs; j++)
                         {
                             send(jeu->joueurs[j].socket, buffer, strlen(buffer), 0);
@@ -315,9 +337,9 @@ void gerer_tours(Etats_Jeu *jeu, StatPartie *stats, int nb_joueurs)
                             /*****Mettre à jour le nombre total de manches******/
                             mettre_a_jour_statistiques(stats, i, 1, 0, 0.0);
                         }
-
+                        sleep(3);
                         jeu->niveau++;
-                        free(jeu->cartes); 
+                        free(jeu->cartes);
                     }
                 }
                 else if (recu == 0)
@@ -328,11 +350,12 @@ void gerer_tours(Etats_Jeu *jeu, StatPartie *stats, int nb_joueurs)
                     snprintf(buffer, TAILLE_BUFFER, "%s s'est déconnecté. Fin de la partie\n", jeu->joueurs[i].nom);
                     for (int j = 0; j < nb_joueurs; j++)
                     {
-                        if(i!=j){
+                        if (i != j)
+                        {
                             send(jeu->joueurs[j].socket, buffer, strlen(buffer), 0);
                         }
-                        
                     }
+                    jeu->vies = 0;
                     break;
                 }
                 else
@@ -345,7 +368,7 @@ void gerer_tours(Etats_Jeu *jeu, StatPartie *stats, int nb_joueurs)
 }
 
 // Boucle principale du serveur
-void boucle_principale(int serveur_socket)
+void boucle_principale(int serveur_socket, int nb_joueurs)
 {
     char buffer[TAILLE_BUFFER]; // Buffer pour envoyer des messages aux clients
     int nb_clients = 0;         // Nombre de clients au début
@@ -353,7 +376,7 @@ void boucle_principale(int serveur_socket)
     StatPartie stats;           // Structure des statistiques du jeu
 
     // Initialiser l'état du jeu au début
-    initialiser_jeu(&jeu, MAX_CLIENTS, NB_VIES, NB_SHURIKENS);
+    initialiser_jeu(&jeu, nb_joueurs);
 
     // Initialiser les statistiques du jeu
     initialiser_stats_partie(&jeu, &stats);
@@ -361,7 +384,7 @@ void boucle_principale(int serveur_socket)
     while (1)
     {
         // Accepter les connexions
-        if (nb_clients < MAX_CLIENTS)
+        if (nb_clients < nb_joueurs)
         {
             printf("En attente de joueurs ... \n");
             // Accepter une nouvelle connexion
@@ -374,7 +397,7 @@ void boucle_principale(int serveur_socket)
                 // Ajouter un client et l'initialiser comme joueur
                 jeu.joueurs[nb_clients].socket = client_socket; // Affecter la valeur du socket à joueur.socket
                 strcpy(jeu.joueurs[nb_clients].nom, nom_client);
-                strcpy(stats.stat_joueurs[nb_clients].joueur.nom, nom_client); //Mise à jour du nom
+                strcpy(stats.stat_joueurs[nb_clients].joueur.nom, nom_client); // Mise à jour du nom
 
                 initialiser_joueur(&(jeu.joueurs[nb_clients]), nom_client);
                 nb_clients++;
@@ -392,7 +415,7 @@ void boucle_principale(int serveur_socket)
         }
 
         // Si tous les joueurs sont connectés, démarrer la partie
-        if (nb_clients == MAX_CLIENTS)
+        if (nb_clients == nb_joueurs)
         {
             printf("Démarrer la manche ... \n");
             // Gérer les tours de jeu
@@ -403,10 +426,13 @@ void boucle_principale(int serveur_socket)
                 gerer_tours(&jeu, &stats, nb_clients);
             }
             break;
-            /* Ajouter la condition dans le cas pù les joueurs ont décidé de terminer la partie */
         }
     }
     /* Sauvgarder les statistiques*/
-    //sauvegarder_statistiques(&stats);
+    sauvegarder_statistiques(&stats);
+
+    for(int i = 0; i < nb_clients; i++){
+        close(jeu.joueurs[i].socket);
+    }
     close(serveur_socket); // Fermer la socket du serveur
 }

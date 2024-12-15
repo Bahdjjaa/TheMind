@@ -1,11 +1,10 @@
 \documentclass{article}
 \usepackage{graphicx}
 \usepackage{geometry}
+\usepackage{listings}
 \geometry{a4paper, margin=1in}
 
 \title{Statistiques du Jeu}
-\author{}
-\date{}
 
 \begin{document}
 \maketitle
@@ -19,5 +18,7 @@
 \section*{Manches réussies par joueur}
 \includegraphics[width=\textwidth]{../Graphiques/manches_reussies_par_joueur.png}
 
+\section*{Classement des joueurs}
+\lstinputlisting{../classement_joueurs.txt}
 
 \end{document}

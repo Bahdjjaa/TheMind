@@ -37,11 +37,10 @@ void initialiser_joueur(Joueur *joueur, const char *nom)
 }
 
 // Etat du jeu par défaut
-void initialiser_jeu(Etats_Jeu *jeu, int nb_joueurs, int vies, int shurikens)
+void initialiser_jeu(Etats_Jeu *jeu, int nb_joueurs)
 {
     jeu->niveau = 1;
-    jeu->vies = vies;
-    jeu->shurikens = shurikens;
+    jeu->vies = nb_joueurs;
     jeu->nb_joueurs = nb_joueurs;
     jeu->joueurs = malloc(nb_joueurs * sizeof(Joueur));
     for (int i = 0; i < nb_joueurs; i++)
@@ -55,7 +54,7 @@ void initialiser_jeu(Etats_Jeu *jeu, int nb_joueurs, int vies, int shurikens)
 // Initialiser les statistiques de la partie
 void initialiser_stats_partie(Etats_Jeu *jeu, StatPartie *stats)
 {
-    //stats->id_partie = id;
+    // stats->id_partie = id;
     stats->total_manches = 0;
     stats->nb_joueurs = jeu->nb_joueurs;
     stats->vals_echec = malloc(NB_CARTES_TOTAL * sizeof(int));
@@ -83,19 +82,23 @@ void mettre_a_jour_statistiques(StatPartie *stats, int id_joueur, int manche_reu
 {
     if (manche_reussie == 1) /*Fin de la manche, toutes mes cartes jouées sont correctes*/
     {
-        for(int i = 0; i < stats->nb_joueurs; i++){
+        for (int i = 0; i < stats->nb_joueurs; i++)
+        {
             stats->stat_joueurs[i].manches_reussies++;
         }
         stats->total_manches++;
-    } else if(manche_reussie == 2){ /*La manche n'est pas encore réussie mais la valeur envoyée est correcte*/
-        stats->stat_joueurs[id_joueur].nb_vals_correctes++; // Incrémenter le nombre de valeurs correctes jouées
+    }
+    else if (manche_reussie == 2)
+    {                                                                    /*La manche n'est pas encore terminée mais la valeur envoyée est correcte*/
+        stats->stat_joueurs[id_joueur].nb_vals_correctes++;              // Incrémenter le nombre de valeurs correctes jouées
         stats->stat_joueurs[id_joueur].temps_reaction += temps_reaction; // Pour calculer la moyenne
     }
     else /*La carte jouée a causé l'échec*/
     {
         stats->stat_joueurs[id_joueur].nb_vals_echec++;
-        stats->vals_echec[valeur_echec - 1]++; // Incrémenter le nombre de fois que la valeur à causer l'échec
+        stats->vals_echec[valeur_echec - 1]++;                           // Incrémenter le nombre de fois que la valeur à causer l'échec
         stats->stat_joueurs[id_joueur].temps_reaction += temps_reaction; // Pour calculer la moyenne
+        stats->total_manches++;
     }
 }
 
@@ -103,7 +106,7 @@ void mettre_a_jour_statistiques(StatPartie *stats, int id_joueur, int manche_reu
 void sauvegarder_statistiques(StatPartie *stats)
 {
     char chemin_fichier[256];
-    snprintf(chemin_fichier, sizeof(chemin_fichier),"GestionnaireStatistiques/stats_partie.txt");
+    snprintf(chemin_fichier, sizeof(chemin_fichier), "GestionnaireStatistiques/stats_partie.txt");
 
     printf("Chemin du fichier : %s\n", chemin_fichier);
 
@@ -125,6 +128,33 @@ void sauvegarder_statistiques(StatPartie *stats)
         fprintf(fd, "Le nombre de fois qu'il a joué une carte correcte: %d \n", s->nb_vals_correctes);
         fprintf(fd, "Le nombre de fois qu'il a causé l'échec échec: %d \n", s->nb_vals_echec);
         fprintf(fd, "Temps réaction moyenne: %.2f \n", s->temps_reaction / stats->total_manches);
+    }
+
+    // Classement basé sur la différence entre valeurs correctes et incorrectes
+    fprintf(fd, "Classement des joueurs\n");
+    for (int i = 0; i < stats->nb_joueurs - 1; i++)
+    {
+        for (int j = 0; j < stats->nb_joueurs - i - 1; j++)
+        {
+            // Calculer les différences pour les joueurs
+            int diff_j = stats->stat_joueurs[j].nb_vals_correctes - stats->stat_joueurs[j].nb_vals_echec;
+            int diff_j1 = stats->stat_joueurs[j + 1].nb_vals_correctes - stats->stat_joueurs[j + 1].nb_vals_echec;
+
+            // permuter les joueurs
+            if (diff_j < diff_j1)
+            {
+                StatJoueur temp = stats->stat_joueurs[j];
+                stats->stat_joueurs[j] = stats->stat_joueurs[j + 1];
+                stats->stat_joueurs[j + 1] = temp;
+            }
+        }
+    }
+
+    // Afficher le classement
+    for (int i = 0; i < stats->nb_joueurs; i++)
+    {
+        StatJoueur *s = &stats->stat_joueurs[i];
+        fprintf(fd, "Rang %d : %s\n", i + 1, s->joueur.nom);
     }
 
     fprintf(fd, "Le nombre de fois que chaque valeur a causé l'échec: \n");
@@ -219,7 +249,6 @@ void afficher_etat_jeu(const Etats_Jeu *jeu)
     printf("État du jeu :\n");
     printf("Niveau : %d\n", jeu->niveau);
     printf("Vies restantes : %d\n", jeu->vies);
-    printf("Shurikens disponibles : %d\n", jeu->shurikens);
     printf("Nombre de joueurs : %d\n", jeu->nb_joueurs);
 
     for (int i = 0; i < jeu->nb_joueurs; i++)

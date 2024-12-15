@@ -25,7 +25,6 @@ typedef struct
 {
     int niveau; //Niveau actuel
     int vies; // Nombre de vies restantes
-    int shurikens; // Nombre de shurikens disponibles
     Joueur *joueurs; // Liste des joeurs
     int nb_joueurs;  // Nombre total de joueurs
     Carte *cartes; // Pile des cartes distribuées
@@ -63,7 +62,7 @@ void melanger_cartes(Carte* pile, int nb_cartes);
 void initialiser_joueur(Joueur *joueur, const char *nom);
 
 // Méthode pour initialiser l'état du jeu
-void initialiser_jeu(Etats_Jeu *etat, int nb_joueurs, int vies, int shurikens);
+void initialiser_jeu(Etats_Jeu *etat, int nb_joueurs);
 
 // Méthode pour initialiser les statiqtiques de la partie
 void initialiser_stats_partie(Etats_Jeu *jeu,StatPartie *stats);

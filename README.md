@@ -1,6 +1,7 @@
 The Mind game
 
 Pour lancer le programme :
+
 1 . Naviguer vers le dossier contenant le Makefile (Le dossier téléchargé)
 2 . Ouvrir un terminal et exécuter la commande 'make'
 3 . Ouvrire deux autres terminaux (en plus du premier) dans le même dossier

@@ -14,3 +14,10 @@ awk '/Joueur:/ { joueur=$2 }
 
 # Les valeurs qui ont causé l'échec
 awk '/Numéro/ { print $2, $4 }' stats_partie.txt > Graphiques/valeurs_echec.dat
+
+# Extraction du classement des joueurs
+awk '/Rang/ { 
+    rang = $2
+    joueur = $4
+    printf "Rang %d : %s\n", rang, joueur
+}' stats_partie.txt > classement_joueurs.txt

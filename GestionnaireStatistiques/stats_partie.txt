@@ -1,16 +1,19 @@
 === STATISTIQUES DE LA PARTIE ===
-Total Manches: 4
+Total Manches: 8
 Nombre de joueurs: 2
-Joueur: Joueur 
-Manches réussies: 4 
+Joueur: A 
+Manches réussies: 6 
+Le nombre de fois qu'il a joué une carte correcte: 5 
+Le nombre de fois qu'il a causé l'échec échec: 2 
+Temps réaction moyenne: 4.88 
+Joueur: ChatGPT 
+Manches réussies: 6 
 Le nombre de fois qu'il a joué une carte correcte: 4 
-Le nombre de fois qu'il a causé l'échec échec: 1 
-Temps réaction moyenne: 7.00 
-Joueur: Joueur 
-Manches réussies: 4 
-Le nombre de fois qu'il a joué une carte correcte: 3 
-Le nombre de fois qu'il a causé l'échec échec: 1 
-Temps réaction moyenne: 9.00 
+Le nombre de fois qu'il a causé l'échec échec: 0 
+Temps réaction moyenne: 6.88 
+Classement des joueurs
+Rang 1 : ChatGPT
+Rang 2 : A
 Le nombre de fois que chaque valeur a causé l'échec: 
 Numéro 1 , 0 fois 
 Numéro 2 , 0 fois 
@@ -32,11 +35,11 @@ Numéro 17 , 0 fois
 Numéro 18 , 0 fois 
 Numéro 19 , 0 fois 
 Numéro 20 , 0 fois 
-Numéro 21 , 1 fois 
+Numéro 21 , 0 fois 
 Numéro 22 , 0 fois 
 Numéro 23 , 0 fois 
 Numéro 24 , 0 fois 
-Numéro 25 , 0 fois 
+Numéro 25 , 1 fois 
 Numéro 26 , 0 fois 
 Numéro 27 , 0 fois 
 Numéro 28 , 0 fois 
@@ -86,7 +89,7 @@ Numéro 71 , 0 fois
 Numéro 72 , 0 fois 
 Numéro 73 , 0 fois 
 Numéro 74 , 0 fois 
-Numéro 75 , 1 fois 
+Numéro 75 , 0 fois 
 Numéro 76 , 0 fois 
 Numéro 77 , 0 fois 
 Numéro 78 , 0 fois 
@@ -106,7 +109,7 @@ Numéro 91 , 0 fois
 Numéro 92 , 0 fois 
 Numéro 93 , 0 fois 
 Numéro 94 , 0 fois 
-Numéro 95 , 0 fois 
+Numéro 95 , 1 fois 
 Numéro 96 , 0 fois 
 Numéro 97 , 0 fois 
 Numéro 98 , 0 fois 
