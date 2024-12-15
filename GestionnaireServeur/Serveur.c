@@ -7,11 +7,9 @@
 #include <sys/socket.h>
 #include <sys/select.h>
 #include <sys/time.h>
-#include <pthread.h>
 
 #define TAILLE_BUFFER 1024
 
-pthread_mutex_t mutex_envoi = PTHREAD_MUTEX_INITIALIZER;
 // Initialiser le serveur
 int initialiser_serveur(const char *adresse_ip, int port)
 {
@@ -299,7 +297,7 @@ void gerer_tours(Etats_Jeu *jeu, StatPartie *stats, int nb_joueurs)
                             return;
                         }else{
                             // Informer les jouers de l'échec
-                            snprintf(buffer, TAILLE_BUFFER, "%s a joué la carte %d..\n===PARTIE TERMINÉE===\nVous n'avez plus de vies\n", jeu->joueurs[i].nom, carte_jouee);
+                            snprintf(buffer, TAILLE_BUFFER, "%s a joué la carte %d..\nVous n'avez plus de vies\n===PARTIE TERMINÉE===\n", jeu->joueurs[i].nom, carte_jouee);
                             nb_cartes_jouees = 0;
                             for (int j = 0; j < nb_joueurs; j++)
                             {

@@ -89,7 +89,7 @@ void boucle_principale_client_humain(int sockfd, const char *nom_joueur)
                 }
                 else if (strstr(buffer, "Continuez") != NULL)
                 {
-                    printf("Vos cartes: ======\n");
+                    printf("Votre main: ======\n");
                     for (int i = 0; i < 50; i++)
                     {
                         if (cartes[i].num != 0 && cartes[i].est_jouee != 1)

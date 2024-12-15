@@ -71,7 +71,7 @@ void boucle_principale_client_robot(int sockfd, const char *nom_robot)
                 {
                     printf("Carte %d : %d\n", (i + 1), cartes[i].num);
                 }
-                printf("\n=======================\n");
+                printf("=======================\n");
             }
             else if (strstr(buffer, "Partie terminée") != NULL)
             {

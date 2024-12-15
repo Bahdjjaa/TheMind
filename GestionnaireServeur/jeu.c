@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 #include <string.h>
 
 // Générer les cartes aléatoirement
@@ -172,6 +173,12 @@ void sauvegarder_statistiques(StatPartie *stats)
 
     // Lancer le script automatisation.sh
     system("cd GestionnaireStatistiques && ./automatisation.sh");
+
+    //Attendre un petit délai
+    sleep(1);
+
+    // Suppression des fichiers .dat et .png et .txt après utilisation
+    system("rm GestionnaireStatistiques/Graphiques/*dat GestionnaireStatistiques/Graphiques/*png GestionnaireStatistiques/*.txt");
 }
 
 void distribuer_cartes(Etats_Jeu *jeu, Carte *pile, int *pile_indice)
