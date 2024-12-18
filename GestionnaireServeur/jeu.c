@@ -5,13 +5,13 @@
 #include <unistd.h>
 #include <string.h>
 
-// Générer les cartes aléatoirement
+// Générer les cartes
 void generer_cartes(Carte *pile)
 {
     for (int i = 0; i < NB_CARTES_TOTAL; i++)
     {
         pile[i].numero = i + 1;
-        pile[i].est_jouee = 0;
+        pile[i].est_jouee = 0; // Non utilisé dans le serveur
     }
 }
 

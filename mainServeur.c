@@ -34,7 +34,5 @@ int main(int argc, char *argv[]){
 
 
     boucle_principale(socket_serveur, nb_joueurs);
-
-    printf("AM OUT OF HERE\n");
     return 0;
 }

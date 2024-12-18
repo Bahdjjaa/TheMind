@@ -26,7 +26,5 @@ int main(int argc, char *argv[]){
     }
 
     boucle_principale_client_humain(client_socket, nom);
-
-    printf("AM OUT OF HERE\n");
     return 0;
 }

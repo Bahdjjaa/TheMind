@@ -21,7 +21,7 @@ int initialiser_serveur(const char *adresse_ip, int port)
     if (serveur_socket == -1)
     {
         perror("Erreur lors de la création du socket");
-        return EXIT_FAILURE;
+        exit(EXIT_FAILURE);
     }
 
     // Configurer l'adresse du serveur
@@ -34,7 +34,7 @@ int initialiser_serveur(const char *adresse_ip, int port)
     {
         perror("Erreur lors du bind");
         close(serveur_socket);
-        return EXIT_FAILURE;
+        exit(EXIT_FAILURE);
     }
 
     // Mettre le serveur en mode écoute
@@ -42,7 +42,7 @@ int initialiser_serveur(const char *adresse_ip, int port)
     {
         perror("Erreur lors de l'écoute");
         close(serveur_socket);
-        return EXIT_FAILURE;
+        exit(EXIT_FAILURE);
     }
 
     return serveur_socket;
@@ -56,10 +56,11 @@ int accepter_connexion(int serveur_socket)
 
     // Accepter une connexion
     int client_socket = accept(serveur_socket, (struct sockaddr *)&adresse_client, &taille_adresse);
-    if (client_socket == -1)
+    if (client_socket < 0)
     {
         perror("Erreur lors de l'acceptation d'une connexion");
-        return EXIT_FAILURE;
+        close(client_socket);
+        exit(EXIT_FAILURE);
     }
 
     printf("Connexion acceptée d'un client\n");
@@ -167,14 +168,6 @@ void distribuer_cartes_clients(Etats_Jeu *jeu, int nb_joueurs)
     free(pile);
     printf("Distribution des cartes terminée.\n");
 
-    /*const char *top_depart = "TOP_DEPART";
-    for(int i = 0; i < nb_joueurs; i++){
-        Joueur *joueur = &jeu->joueurs[i];
-        if(send(joueur->socket, top_depart, strlen(top_depart), 0) < 0){
-            perror("Erreur lors d el'envoi du signal de départ");
-            exit(EXIT_FAILURE);
-        }
-    }*/
 }
 
 // Gérer les tours de jeu
@@ -432,5 +425,7 @@ void boucle_principale(int serveur_socket, int nb_joueurs)
     for(int i = 0; i < nb_clients; i++){
         close(jeu.joueurs[i].socket);
     }
+    free(jeu.joueurs);
+    free(stats.stat_joueurs);
     close(serveur_socket); // Fermer la socket du serveur
 }

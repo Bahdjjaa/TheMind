@@ -14,7 +14,7 @@ int main(int argc, char *argv[]){
 
     char *adresse_ip = argv[1]; // Récupérer l'adresse IP passée en paramètre
 
-   /*Récupérer le nom du client*/
+   /*Nom du robot*/
    char *nom = "ChatGPT";
 
     printf("Connexion au serveur %s:%d...\n", adresse_ip, PORT);
@@ -26,7 +26,5 @@ int main(int argc, char *argv[]){
     }
 
     boucle_principale_client_robot(robot_socket, nom);
-
-    printf("AM OUT OF HERE\n");
     return 0;
 }
